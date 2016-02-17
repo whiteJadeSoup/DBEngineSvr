@@ -41,4 +41,18 @@ enum class L2D
 };
 
 
+enum class M2D
+{
+
+    /*
+     *
+     * @parm      id          : 玩家id
+     * @return    name        : 玩家名称
+     * @return    nick_name   : 玩家昵称
+     */
+    ReadUserInfo                    = 4000,
+};
+
+
+
 #endif // CLIENTMSGTYPEDEFINE_HPP_INCLUDED

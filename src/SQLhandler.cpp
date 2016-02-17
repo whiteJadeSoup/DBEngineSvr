@@ -4,7 +4,7 @@
 #include <cppconn/prepared_statement.h>
 
 using namespace std;
-bool SQLhandler::Validate (connection_ptr conn_ptr_, std::string& id, std::string& passwd)
+bool SQLhandler::Validate (connection_ptr conn_ptr_, UL64 id, std::string& passwd)
 {
 
     try
@@ -22,7 +22,7 @@ bool SQLhandler::Validate (connection_ptr conn_ptr_, std::string& id, std::strin
         sql::PreparedStatement  *prep_stmt =
         conn_ptr_->prepareStatement("SELECT * FROM userinfo WHERE id=? AND password=?");
 
-        prep_stmt->setString(1,id);
+        prep_stmt->setString(1,to_string(id));
         prep_stmt->setString(2, passwd);
 
         sql::ResultSet* rs = prep_stmt->executeQuery();

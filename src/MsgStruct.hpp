@@ -2,6 +2,8 @@
 #define MSGSTRUCT_HPP_INCLUDED
 
 #include <string>
+#include "typeinfo.hpp"
+
 
 struct Msg_validate
 {
@@ -17,7 +19,7 @@ struct Msg_validate
         ar & m_passwd;
     }
 
-    std::string m_id;
+    UL64 m_id;
     std::string m_passwd;
 };
 

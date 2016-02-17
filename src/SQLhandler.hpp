@@ -5,13 +5,15 @@
 #include <string>
 #include <mysql_connection.h>
 
+#include "typeinfo.hpp"
+
 typedef std::shared_ptr<sql::Connection> connection_ptr;
 
 class SQLhandler
 {
 public:
 
-    bool Validate(connection_ptr, std::string&, std::string&);
+    bool Validate(connection_ptr, UL64, std::string&);
 private:
 };
 
