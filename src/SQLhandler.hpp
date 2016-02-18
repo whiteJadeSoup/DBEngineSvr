@@ -3,17 +3,20 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 #include <mysql_connection.h>
 
-#include "typeinfo.hpp"
 
-typedef std::shared_ptr<sql::Connection> connection_ptr;
+using namespace std;
+
+typedef shared_ptr<sql::Connection> connection_ptr;
 
 class SQLhandler
 {
 public:
 
-    bool Validate(connection_ptr, UL64, std::string&);
+    bool Validate(connection_ptr, uint64_t, string&);
+    bool ReadInfo(connection_ptr, uint64_t, vector<string>&);
 private:
 };
 
