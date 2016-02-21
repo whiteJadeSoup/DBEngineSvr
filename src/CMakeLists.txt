@@ -5,6 +5,7 @@ project (DBEngineSvr)
 
 
 # policy
+# 去除使用相对路径的提示
 cmake_policy(SET CMP0015 OLD)
 
 message (STATUS "compiler is ${CMAKE_CXX_COMPILER_ID}" )
@@ -13,6 +14,7 @@ message (STATUS "current dir: ${CMAKE_CURRENT_SOURCE_DIR}")
 
 ADD_DEFINITIONS (-std=c++0x -g -Wall )
 
+# 验证是否支持C++11
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
     execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
     if (NOT (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7))
