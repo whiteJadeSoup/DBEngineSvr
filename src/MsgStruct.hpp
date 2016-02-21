@@ -26,7 +26,7 @@ struct Msg_validate
 
 struct Msg_validate_result
 {
-    Msg_validate_result () :m_bResult(false)
+    Msg_validate_result () :m_bResult(false), m_ulUserId(0)
     {
 
     }
@@ -35,13 +35,11 @@ struct Msg_validate_result
     void serialize(Archive& ar, const unsigned int version)
     {
         ar & m_bResult;
-        ar & m_ip;
-        ar & m_port;
+        ar & m_ulUserId;
     }
 
     bool m_bResult;
-    std::string m_ip;
-    std::string m_port;
+    uint64_t m_ulUserId;
 };
 
 
