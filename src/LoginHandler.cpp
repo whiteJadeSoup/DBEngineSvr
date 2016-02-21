@@ -54,13 +54,9 @@ void LoginHander::handle_UserValidate ()
 
     Msg_validate_result validate_result;
     validate_result.m_bResult = result;
+    validate_result.m_ulUserId = validate.m_id;
 
     std::cout << "validate result: " << result << std::endl;
-    if (result)
-    {
-        validate_result.m_ip    = "127.0.0.1";
-        validate_result.m_port  = "11000";
-    }
 
     // release conn
     ConnPool::get_instance()->release_conn(free_conn);
