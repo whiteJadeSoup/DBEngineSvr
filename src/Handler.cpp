@@ -9,7 +9,7 @@
  */
 
 Handler::Handler(ip::tcp::socket sock_)
-    :m_sock (std::move(sock_))
+    :m_sock (move(sock_))
 {
 
 }

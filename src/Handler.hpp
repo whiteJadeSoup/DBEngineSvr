@@ -13,6 +13,7 @@
 #include "CMsg.h"
 
 using namespace boost::asio;
+using namespace std;
 
 class Handler: public std::enable_shared_from_this<Handler>
 {
@@ -47,15 +48,15 @@ public:
     void deserialization(T& t, boost::asio::streambuf& buf)
     {
 
-        std::ostringstream os;
+        ostringstream os;
         os << &buf;
 
-        std::string ser_data (os.str());
-        std::istringstream is(ser_data);
+        string ser_data (os.str());
+        istringstream is(ser_data);
         boost::archive::text_iarchive ia(is);
         ia & t;
 
-        std::cout << "buf size: " <<buf.size() <<std::endl;
+        cout << "buf size: " <<buf.size() << endl;
     }
 private:
 
@@ -74,8 +75,8 @@ protected:
 
     boost::asio::streambuf m_rBuf;
     boost::asio::streambuf m_wBuf;
-    std::array<char, 8> head_info;
-    std::string send_str;
+    array<char, 8> head_info;
+    string send_str;
 };
 
 
