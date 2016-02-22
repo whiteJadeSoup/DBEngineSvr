@@ -59,8 +59,9 @@ set (Used_Boost_libs ${Boost_system_lib} ${Boost_serialization_lib} ${Boost_sign
 set (Used_Mysql_libs ${mysql_lib})
 
 # 当前目前下的所有源文件
+file(GLOB_RECURSE HEAD_FILES *h *hpp)
 aux_source_directory (. DIR_SRCS)
-ADD_EXECUTABLE(${PROJECT_NAME} ${DIR_SRCS})
+ADD_EXECUTABLE(${PROJECT_NAME} ${DIR_SRCS} ${HEAD_FILES})
 
 
 #
