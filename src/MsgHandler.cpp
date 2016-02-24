@@ -1,7 +1,7 @@
 
 #include "MsgHandler.hpp"
 #include "ConnPool.hpp"
-#include "CMsg.h"
+#include "CMsg.hpp"
 #include "MsgStruct.hpp"
 #include "ClientMsgTypeDefine.hpp"
 

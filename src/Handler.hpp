@@ -10,7 +10,7 @@
 #include <boost/asio/write.hpp>
 #include <boost/asio/streambuf.hpp>
 
-#include "CMsg.h"
+#include "CMsg.hpp"
 
 using namespace boost::asio;
 using namespace std;
