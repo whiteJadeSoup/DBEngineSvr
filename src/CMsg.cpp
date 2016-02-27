@@ -46,7 +46,7 @@ int CMsg::send_data_len()
 
 
 
-std::string CMsg::get_send_data()
+const string& CMsg::get_send_data() const
 {
     return m_send_data;
 }

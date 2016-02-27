@@ -37,7 +37,7 @@ enum class L2D
      * @return    ip        : (如果验证成功则返回)监听ip
      * @return    port      : (如果验证成功则返回)监听端口
      */
-    UserValidate                     = 1000,
+    UserValidate                     = 3000,
 };
 
 

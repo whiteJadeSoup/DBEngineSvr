@@ -48,18 +48,11 @@ public:
 
 
     template <class T>
-    void deserialization(T& t, boost::asio::streambuf& buf)
+    void deserialization(T& t, string buf_)
     {
-
-        ostringstream os;
-        os << &buf;
-
-        string ser_data (os.str());
-        istringstream is(ser_data);
+        istringstream is(buf_);
         boost::archive::text_iarchive ia(is);
         ia & t;
-
-        cout << "buf size: " <<buf.size() <<endl;
     }
 
     template <class T>

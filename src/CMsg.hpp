@@ -5,6 +5,8 @@
 #include <sstream>
 #include <string>
 
+using namespace std;
+
 class CMsg
 {
 public:
@@ -17,21 +19,31 @@ public:
     int get_msg_type();
 
     template <class T >
-    void set_send_data(const T& t)
+    void serialization_data_Asio(const T& t)
     {
-        std::ostringstream os;
+        ostringstream os;
         boost::archive::text_oarchive oa(os);
         oa & t;
 
         m_send_data.clear();
         m_send_data = os.str();
-        std::cout << "now, string: " << m_send_data << std::endl;
+        cout << "now, string: " << m_send_data << endl;
     }
 
+    template <class T>
+    void serialization_data_protobuf(const T& t)
+    {
+        m_send_data.clear();
+        bool result = t.SerializeToString(&m_send_data);
 
-    std::string get_send_data();
+        cout << "serialize result: " << result << endl;
+    }
 
+    const string& get_send_data() const;
     int send_data_len();
+
+
+
 
 private:
     int m_type;
