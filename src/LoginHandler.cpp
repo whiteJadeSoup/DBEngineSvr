@@ -20,7 +20,7 @@ void LoginHander::start()
 {
     // connection pool init
     ConnPool::get_instance()->init_ConnPool();
-    read_head_from_socket();
+    read_head();
 }
 
 
@@ -53,7 +53,7 @@ void LoginHander::handle_UserValidate (string buf_)
     cout << "passwd: " << validate.m_passwd << endl;
 
     connection_ptr free_conn = ConnPool::get_instance()->get_free_conn();
-    bool result = m_sql_handler.Validate(free_conn, validate.m_id, validate.m_passwd);
+    bool result = m_sql_handler.validate(free_conn, validate.m_id, validate.m_passwd);
 
     Msg_validate_result validate_result;
     validate_result.m_bResult = result;
@@ -67,5 +67,5 @@ void LoginHander::handle_UserValidate (string buf_)
     CMsg packet;
     packet.set_msg_type((int)L2D::UserValidate);
     packet.serialization_data_Asio(validate_result);
-    send_msg(packet);
+    send(packet);
 }
