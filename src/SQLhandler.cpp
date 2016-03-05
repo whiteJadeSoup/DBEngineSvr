@@ -4,7 +4,7 @@
 #include <cppconn/prepared_statement.h>
 
 
-bool SQLhandler::Validate (connection_ptr conn_ptr_, uint64_t id, string& passwd)
+bool SQLhandler::validate (connection_ptr conn_ptr_, int64_t id, string& passwd)
 {
 
     try
@@ -53,7 +53,7 @@ bool SQLhandler::Validate (connection_ptr conn_ptr_, uint64_t id, string& passwd
 
 
 
-bool SQLhandler::ReadInfo(connection_ptr conn_, uint64_t userid_, vector<string>& result_)
+bool SQLhandler::read_info(connection_ptr conn_, int64_t userid_, vector<string>& result_)
 {
 
     try

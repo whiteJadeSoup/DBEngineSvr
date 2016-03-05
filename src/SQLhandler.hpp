@@ -15,8 +15,8 @@ class SQLhandler
 {
 public:
 
-    bool Validate(connection_ptr, uint64_t, string&);
-    bool ReadInfo(connection_ptr, uint64_t, vector<string>&);
+    bool validate(connection_ptr, int64_t, string&);
+    bool read_info(connection_ptr, int64_t, vector<string>&);
 private:
 };
 
