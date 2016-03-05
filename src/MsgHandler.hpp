@@ -20,7 +20,7 @@ public:
 
 
 private:
-    void handle_ReadUserInfo();
+    void handle_read_user_info(string);
 
 private:
     SQLhandler m_sql_handler;
