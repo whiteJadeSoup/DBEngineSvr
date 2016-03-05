@@ -53,19 +53,21 @@ struct Msg_user_info
     template <typename Archive>
     void serialize(Archive& ar, const unsigned int version)
     {
+        ar & m_nId;
         ar & m_strName;
         ar & m_strNickName;
     }
 
+    int64_t m_nId;
     string m_strName;
     string m_strNickName;
 };
 
 
-struct Msg_user_id
+struct Msg_login_id
 {
 
-    Msg_user_id (): m_nId(0)
+    Msg_login_id (): m_nId(0)
     {
 
     }
@@ -76,7 +78,7 @@ struct Msg_user_id
         ar & m_nId;
     }
 
-    uint64_t  m_nId;
+    int64_t  m_nId;
 };
 
 #endif // MSGSTRUCT_HPP_INCLUDED
