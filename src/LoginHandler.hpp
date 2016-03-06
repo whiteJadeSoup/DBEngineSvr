@@ -9,10 +9,10 @@
 using namespace boost::asio;
 using namespace std;
 
-class LoginHander: public Handler
+class LoginHandler: public Handler
 {
 public:
-    LoginHander (ip::tcp::socket);
+    LoginHandler (ip::tcp::socket);
 
 
     virtual void start () override;

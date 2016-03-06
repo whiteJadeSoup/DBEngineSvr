@@ -8,7 +8,7 @@
 
 
 
-LoginHander::LoginHander(ip::tcp::socket login_sock_)
+LoginHandler::LoginHandler(ip::tcp::socket login_sock_)
   :Handler(std::move(login_sock_))
 {
 
@@ -16,7 +16,7 @@ LoginHander::LoginHander(ip::tcp::socket login_sock_)
 
 
 
-void LoginHander::start()
+void LoginHandler::start()
 {
     // connection pool init
     ConnPool::get_instance()->init_ConnPool();
@@ -24,11 +24,11 @@ void LoginHander::start()
 }
 
 
-void LoginHander::process_msg(int type_, string buf_)
+void LoginHandler::process_msg(int type_, string buf_)
 {
     switch (type_)
     {
-    case (int)L2D::UserValidate:
+    case (int)L2D::VALIDATE:
         handle_UserValidate(buf_);
         break;
     default:
@@ -43,7 +43,7 @@ void LoginHander::process_msg(int type_, string buf_)
  *
  */
 
-void LoginHander::handle_UserValidate (string buf_)
+void LoginHandler::handle_UserValidate (string buf_)
 {
     Msg_validate validate;
     deserialization(validate, buf_);
@@ -65,7 +65,7 @@ void LoginHander::handle_UserValidate (string buf_)
     ConnPool::get_instance()->release_conn(free_conn);
 
     CMsg packet;
-    packet.set_msg_type((int)L2D::UserValidate);
+    packet.set_msg_type((int)L2D::VALIDATE);
     packet.serialization_data_Asio(validate_result);
     send(packet);
 }
