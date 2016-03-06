@@ -37,7 +37,7 @@ enum class L2D
      * @return    ip        : (如果验证成功则返回)监听ip
      * @return    port      : (如果验证成功则返回)监听端口
      */
-    UserValidate                     = 3000,
+    VALIDATE                     = 3000,
 };
 
 
@@ -50,7 +50,7 @@ enum class M2D
      * @return    name        : 玩家名称
      * @return    nick_name   : 玩家昵称
      */
-    ReadUserInfo                    = 4000,
+    READ_INFO                    = 5000,
 };
 
 
