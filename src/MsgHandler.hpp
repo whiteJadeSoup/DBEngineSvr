@@ -1,5 +1,5 @@
-#ifndef LOGINHANDLER_HPP_INCLUDED
-#define LOGINHANDLER_HPP_INCLUDED
+#ifndef MSGHANDLER_HPP_INCLUDED
+#define MSGHANDLER_HPP_INCLUDED
 
 #include <boost/asio/ip/tcp.hpp>
 #include <string>
@@ -27,4 +27,4 @@ private:
 };
 
 
-#endif // LOGINHANDLER_HPP_INCLUDED
+#endif // MSGHANDLER_HPP_INCLUDED

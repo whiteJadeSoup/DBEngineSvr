@@ -28,7 +28,7 @@ void MsgHandler::process_msg(int type_, string buf_)
 {
     switch (type_)
     {
-    case (int)M2D::ReadUserInfo:
+    case (int)M2D::READ_INFO:
         handle_read_user_info(buf_);
         break;
     default:
@@ -61,7 +61,7 @@ void MsgHandler::handle_read_user_info(string buf_)
 
 
     CMsg packet;
-    packet.set_msg_type((int)M2D::ReadUserInfo);
+    packet.set_msg_type((int)M2D::READ_INFO);
     packet.serialization_data_Asio(user_info);
 
     send(packet);
