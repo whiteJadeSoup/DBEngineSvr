@@ -20,7 +20,7 @@ bool SQLhandler::validate (connection_ptr conn_ptr_, int64_t id, string& passwd)
         conn_ptr_->setSchema("account");
 
         sql::PreparedStatement  *prep_stmt =
-        conn_ptr_->prepareStatement("SELECT * FROM userinfo WHERE id=? AND password=?");
+        conn_ptr_->prepareStatement("SELECT * FROM t_user_auth WHERE id=? AND password=?");
 
         prep_stmt->setString(1,to_string(id));
         prep_stmt->setString(2, passwd);
@@ -69,7 +69,7 @@ bool SQLhandler::read_info(connection_ptr conn_, int64_t userid_, vector<string>
         conn_->setSchema("account");
 
         sql::PreparedStatement* prep_stmt =
-            conn_->prepareStatement("SELECT * FROM userinfo WHERE id=?");
+            conn_->prepareStatement("SELECT name,nick_name FROM t_user_info WHERE id=?");
 
 
         prep_stmt->setString(1, to_string(userid_));
@@ -78,8 +78,8 @@ bool SQLhandler::read_info(connection_ptr conn_, int64_t userid_, vector<string>
 
         while (res->next())
         {
-            result_.push_back(res->getString("Name"));
-            result_.push_back(res->getString("NickName"));
+            result_.push_back(res->getString("name"));
+            result_.push_back(res->getString("nick_name"));
         }
 
 
