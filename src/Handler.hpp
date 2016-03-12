@@ -62,8 +62,6 @@ protected:
     void decode();
     int32_t AsInt32 (const char* buf);
 
-    shared_ptr<google::protobuf::Message> CreateMessage(const string&);
-
 
 protected:
     using err_code = boost::system::error_code;

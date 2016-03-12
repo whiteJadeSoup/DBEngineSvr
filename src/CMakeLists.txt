@@ -1,6 +1,6 @@
 
 cmake_minimum_required (VERSION 2.8)
-# Project 
+# Project
 project (DBEngineSvr)
 
 
@@ -28,40 +28,34 @@ if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
     endif ()
 
 
-# 设置boost库路径
-set (Boost_root_path    ../boost)
-set (Boost_head_path    ${Boost_root_path}/include)
-set (Boost_lib_path	    ${Boost_root_path}/lib)
 
 # 设置mysql
 set (Mysql_root_path    ../mysql)
 set (Mysql_head_path    ${Mysql_root_path}/include)
 set (Mysql_lib_path	    ${Mysql_root_path}/lib)
 
-
-include_directories(${Boost_head_path})
-LINK_DIRECTORIES(${Boost_lib_path})
-
 include_directories(${Mysql_head_path})
 LINK_DIRECTORIES(${Mysql_lib_path})
 
-
-# use boost lib
-set (Boost_system_lib 		    libboost_system.a)
-set (Boost_serialization_lib 	libboost_serialization.a)
-set (Boost_signals_lib 		    libboost_signals.a)
-
 # use mysql lib
 set (mysql_lib 	libmysqlcppconn.so)
-
-
-set (Used_Boost_libs ${Boost_system_lib} ${Boost_serialization_lib} ${Boost_signals_lib})
 set (Used_Mysql_libs ${mysql_lib})
 
 
-# set used protobuf
-set (Pb_lib	libprotobuf.a)
-set (Pb_used_libs ${Pb_lib})
+
+# find Boost
+set(Boost_USE_STATIC_LIBS ON)
+
+find_package(Boost 1.50.0 REQUIRED COMPONENTS system serialization)
+if(Boost_FOUND)
+
+    message(STATUS  "Boost include dirs: " ${Boost_INCLUDE_DIRS})
+    message(STATUS  "Boost lib dirs: " ${Boost_LIBRARY_DIRS})
+    include_directories(${Boost_INCLUDE_DIRS})
+    LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
+endif()
+
+#set (Used_Boost_libs ${BOOST_SIGNALS_LIBRARY} ${BOOST_SYSTEM_LIBRARY} ${BOOST_SERIALIZATION_LIBRARY})
 
 # 当前目前下的所有源文件
 file(GLOB_RECURSE HEAD_FILES *h *hpp)
@@ -70,7 +64,8 @@ ADD_EXECUTABLE(${PROJECT_NAME} ${DIR_SRCS} ${HEAD_FILES})
 
 
 #
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${Used_Boost_libs} ${Used_Mysql_libs} ${Pb_used_libs})
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${Used_Mysql_libs})
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${Boost_LIBRARIES})
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} -lpthread)
 
 
