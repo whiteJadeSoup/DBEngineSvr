@@ -55,7 +55,6 @@ if(Boost_FOUND)
     LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
 endif()
 
-#set (Used_Boost_libs ${BOOST_SIGNALS_LIBRARY} ${BOOST_SYSTEM_LIBRARY} ${BOOST_SERIALIZATION_LIBRARY})
 
 # 当前目前下的所有源文件
 file(GLOB_RECURSE HEAD_FILES *h *hpp)
