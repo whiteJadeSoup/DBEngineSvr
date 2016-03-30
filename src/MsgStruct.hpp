@@ -2,7 +2,7 @@
 #define MSGSTRUCT_HPP_INCLUDED
 
 #include <string>
-
+#include <boost/serialization/vector.hpp>
 
 
 struct Msg_validate
@@ -64,10 +64,10 @@ struct Msg_user_info
 };
 
 
-struct Msg_login_id
+struct MSG_LOGIN_ID
 {
 
-    Msg_login_id (): m_nId(0)
+    MSG_LOGIN_ID (): m_nId(0)
     {
 
     }
@@ -80,5 +80,57 @@ struct Msg_login_id
 
     int64_t  m_nId;
 };
+
+
+
+struct USER
+{
+    int64_t     m_user_id;      // id
+    string      m_name;         // 姓名
+    string      m_nick_name;    // 昵称
+
+    template <typename Archive>
+    void serialize(Archive& ar, const unsigned int version)
+    {
+        ar & m_user_id;
+        ar & m_name;
+        ar & m_nick_name;
+    }
+
+};
+
+struct MSG_CONTACTS
+{
+    MSG_CONTACTS() :m_req_id(0)
+    {
+
+    }
+
+    int64_t             m_req_id;       // 请求者id
+    std::vector<USER>   m_contacts;
+
+
+    template< typename Archive>
+    void serialize(Archive& ar, const unsigned int version)
+    {
+        ar & m_req_id;
+        ar & m_contacts;
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #endif // MSGSTRUCT_HPP_INCLUDED
