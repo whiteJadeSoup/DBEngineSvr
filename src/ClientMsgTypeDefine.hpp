@@ -50,7 +50,21 @@ enum class M2D
      * @return    name        : 玩家名称
      * @return    nick_name   : 玩家昵称
      */
-    READ_INFO                    = 5000,
+    READ_INFO                       = 5000,
+
+    /*
+     * 请求联系人列表
+     * @parm    user_id
+     * @return  int 总人数,
+     *          循环
+     *          [
+     *              int     id,         // 用户id
+     *              string  name,       // 姓名
+     *              string  nick_name   // 昵称
+     *          ]
+     */
+     FETCH_CONTACTS                 = 5001,
+
 };
 
 
