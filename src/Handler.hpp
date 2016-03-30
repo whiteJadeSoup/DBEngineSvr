@@ -66,10 +66,6 @@ protected:
 protected:
     using err_code = boost::system::error_code;
 
-    /*
-     * 对clienthandler来说意味着一个客户端的socket的引用
-     * 对routerhandler来说意味着连接routersvr的socket的引用
-     */
     ip::tcp::socket m_sock;
 
     boost::asio::streambuf m_rBuf;

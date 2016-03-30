@@ -20,7 +20,11 @@ public:
 
 
 private:
+    // 读取用户信息
     void handle_read_user_info(string);
+    // 获取联系人列表
+    void handle_fetch_contacts(string);
+
 
 private:
     SQLhandler m_sql_handler;
