@@ -60,10 +60,10 @@ void MsgHandler::handle_read_user_info(string buf_)
     m_sql_handler.read_info(free_conn, user.m_nId, result);
 
     Msg_user_info user_info;
-    user_info.m_nId = user.m_nId;
-    user_info.m_strName = result[0];
+    user_info.m_nId         = user.m_nId;
+    user_info.m_strName     = result[0];
     user_info.m_strNickName = result[1];
-
+    user_info.m_strSex      = result[2];
 
     CMsg packet;
     packet.set_msg_type((int)M2D::READ_INFO);
@@ -93,6 +93,8 @@ void MsgHandler::handle_fetch_contacts(string buf_)
         user.m_user_id      = static_cast<int64_t>(stoi(result[i]));
         user.m_name         = result[i+1];
         user.m_nick_name    = result[i+2];
+        user.m_sex          = result[i+3];
+
 
         contacts.m_contacts.push_back(user);
     }

@@ -56,11 +56,13 @@ struct Msg_user_info
         ar & m_nId;
         ar & m_strName;
         ar & m_strNickName;
+        ar & m_strSex;
     }
 
     int64_t m_nId;
     string m_strName;
     string m_strNickName;
+    string m_strSex;
 };
 
 
@@ -88,6 +90,7 @@ struct USER
     int64_t     m_user_id;      // id
     string      m_name;         // 姓名
     string      m_nick_name;    // 昵称
+    string      m_sex;          // 性别
 
     template <typename Archive>
     void serialize(Archive& ar, const unsigned int version)
@@ -95,6 +98,7 @@ struct USER
         ar & m_user_id;
         ar & m_name;
         ar & m_nick_name;
+        ar & m_sex;
     }
 
 };

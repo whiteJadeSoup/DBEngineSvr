@@ -69,7 +69,7 @@ bool SQLhandler::read_info(connection_ptr conn_, int64_t userid_, vector<string>
         conn_->setSchema("account");
 
         sql::PreparedStatement* prep_stmt =
-            conn_->prepareStatement("SELECT name,nick_name FROM t_user_info WHERE id=?");
+            conn_->prepareStatement("SELECT name,nick_name,sex FROM t_user_info WHERE id=?");
 
 
         prep_stmt->setString(1, to_string(userid_));
@@ -80,6 +80,7 @@ bool SQLhandler::read_info(connection_ptr conn_, int64_t userid_, vector<string>
         {
             result_.push_back(res->getString("name"));
             result_.push_back(res->getString("nick_name"));
+            result_.push_back(res->getString("sex"));
         }
 
 
@@ -145,6 +146,7 @@ bool SQLhandler::read_contacts(connection_ptr conn_, int64_t user_id_, vector<st
                 vPassData.push_back(*it);                               // id
                 vPassData.push_back(res->getString("name"));            // name
                 vPassData.push_back(res->getString("nick_name"));       // nick_name
+                vPassData.push_back(res->getString("sex"));
             }
             else
             {
