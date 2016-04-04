@@ -5,8 +5,8 @@ using namespace std;
 
 int main()
 {
-    io_service io;
-    Server server (io, 11000, 12000);
-    io.run();
+    Server server ( 11000, 12000);
+    server.run();
+
     return 0;
 }

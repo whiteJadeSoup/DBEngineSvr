@@ -4,7 +4,7 @@
 #include <cppconn/prepared_statement.h>
 
 
-bool SQLhandler::validate (connection_ptr conn_ptr_, int64_t id, string& passwd)
+bool SQLhandler::validate (db_connect_ptr conn_ptr_, int64_t id, string& passwd)
 {
 
     try
@@ -53,7 +53,7 @@ bool SQLhandler::validate (connection_ptr conn_ptr_, int64_t id, string& passwd)
 
 
 
-bool SQLhandler::read_info(connection_ptr conn_, int64_t userid_, vector<string>& result_)
+bool SQLhandler::read_info(db_connect_ptr conn_, int64_t userid_, vector<string>& result_)
 {
 
     try
@@ -103,7 +103,7 @@ bool SQLhandler::read_info(connection_ptr conn_, int64_t userid_, vector<string>
 
 
 
-bool SQLhandler::read_contacts(connection_ptr conn_, int64_t user_id_, vector<string>& vPassData)
+bool SQLhandler::read_contacts(db_connect_ptr conn_, int64_t user_id_, vector<string>& vPassData)
 {
 
     try
@@ -133,7 +133,7 @@ bool SQLhandler::read_contacts(connection_ptr conn_, int64_t user_id_, vector<st
 
 
         // 获得联系人具体信息
-        prep_stmt = conn_->prepareStatement("SELECT name, nick_name FROM t_user_info WHERE id=?");
+        prep_stmt = conn_->prepareStatement("SELECT name, nick_name, sex FROM t_user_info WHERE id=?");
 
         auto it = contact_ids.begin();
         for(; it != contact_ids.end(); ++it)

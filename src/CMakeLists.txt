@@ -5,41 +5,31 @@ project (DBEngineSvr)
 
 
 # policy
-# 去除使用相对路径的提示
 cmake_policy(SET CMP0015 OLD)
 
 message (STATUS "compiler is ${CMAKE_CXX_COMPILER_ID}" )
 message (STATUS "source dir: ${PROJECT_SOURCE_DIR} ")
 message (STATUS "current dir: ${CMAKE_CURRENT_SOURCE_DIR}")
 
-ADD_DEFINITIONS (-std=c++0x -g -Wall )
-
-# 验证是否支持C++11
-if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
-    execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
-    if (NOT (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7))
-        message(FATAL_ERROR "${PROJECT_NAME} requires g++ 4.7 or greater.")
-    endif ()
-    elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
-
-    else ()
-        message(FATAL_ERROR "Your C++ compiler does not support C++11.")
-    endif ()
+if (NOT win32)
+    add_definitions(-std=c++11 -g)
+endif()
 
 
 
-# 设置mysql
-set (Mysql_root_path    ../mysql)
-set (Mysql_head_path    ${Mysql_root_path}/include)
-set (Mysql_lib_path	    ${Mysql_root_path}/lib)
+#  设置protobuf 生成文件的路径
+set (Pb_gen_root_path	../protobuf_gen)
+set (Pb_gen_file_path	${Pb_gen_root_path}/include/)
 
-include_directories(${Mysql_head_path})
-LINK_DIRECTORIES(${Mysql_lib_path})
+include_directories(${Pb_gen_file_path})
 
-# use mysql lib
-set (mysql_lib 	libmysqlcppconn.so)
-set (Used_Mysql_libs ${mysql_lib})
+
+#  设置protobuf文件路径
+set (Pb_head_path 	../protobuf/)
+set (Pb_lib_path	../protobuf/lib)
+
+include_directories(${Pb_head_path})
+LINK_DIRECTORIES(${Pb_lib_path})
 
 
 
@@ -56,15 +46,59 @@ if(Boost_FOUND)
 endif()
 
 
-# 当前目前下的所有源文件
-file(GLOB_RECURSE HEAD_FILES *h *hpp)
+#find protobuf
+find_package(Protobuf REQUIRED)
+if(PROTOBUF_FOUND)
+    message(STATUS "protobuf include dirs: " ${PROTOBUF_INCLUDE_DIRS})
+    message(STATUS "protobuf lib dirs: " ${PROTOBUF_LIBRARY})
+
+    include_directories(${PROTOBUF_INCLUDE_DIRS})
+endif()
+
+
+
+# 设置mysql
+set (Mysql_root_path    ../mysql)
+set (Mysql_head_path    ${Mysql_root_path}/include)
+set (Mysql_lib_path	    ${Mysql_root_path}/lib)
+
+include_directories(${Mysql_head_path})
+LINK_DIRECTORIES(${Mysql_lib_path})
+
+# use mysql lib
+set (mysql_lib 	libmysqlcppconn.so)
+set (USED_MYSQL_LIBS ${mysql_lib})
+
+
+
 aux_source_directory (. DIR_SRCS)
-ADD_EXECUTABLE(${PROJECT_NAME} ${DIR_SRCS} ${HEAD_FILES})
+aux_source_directory (${Pb_gen_file_path} PB_GEN_SRCS)
+
+file(GLOB_RECURSE HEAD_FILES *h *hpp)
+file(GLOB_RECURSE PB_GEN_HEAD_FILES ../protobuf_gen/include/*.h ../protobuf_gen/include/*.hpp)
 
 
-#
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${Used_Mysql_libs})
+ADD_EXECUTABLE(${PROJECT_NAME} ${DIR_SRCS} ${PB_GEN_SRCS} ${HEAD_FILES} ${PB_GEN_HEAD_FILES})
+
+
+
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${USED_MYSQL_LIBS})
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROTOBUF_LIBRARIES} )
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${Boost_LIBRARIES})
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} -lpthread)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

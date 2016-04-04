@@ -12,12 +12,12 @@ public:
     static ConnPool* get_instance();
 
     void init_ConnPool();
-    connection_ptr new_conn();
+    db_connect_ptr new_conn();
 
-    connection_ptr get_free_conn();
-    connection_ptr find_free_conn();
+    db_connect_ptr get_free_conn();
+    db_connect_ptr find_free_conn();
 
-    void release_conn(connection_ptr);
+    void release_conn(db_connect_ptr);
     void destory_ConnPool();
 
     void set_conn_max(int);

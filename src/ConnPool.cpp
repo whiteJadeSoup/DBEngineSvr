@@ -73,7 +73,7 @@ void ConnPool::destory_ConnPool()
  *
  *  get/new/find a conn
  */
-connection_ptr ConnPool::new_conn()
+db_connect_ptr ConnPool::new_conn()
 {
     try
     {
@@ -105,7 +105,7 @@ connection_ptr ConnPool::new_conn()
     }
 }
 
-void ConnPool::release_conn(connection_ptr conn_ptr_)
+void ConnPool::release_conn(db_connect_ptr conn_ptr_)
 {
      auto it = find_if(m_conns.begin(), m_conns.end(),
                 [=] (Conn& conn_)
@@ -124,14 +124,14 @@ void ConnPool::release_conn(connection_ptr conn_ptr_)
     }
 }
 
-connection_ptr ConnPool::get_free_conn()
+db_connect_ptr ConnPool::get_free_conn()
 {
-    connection_ptr free_conn = find_free_conn();
+    db_connect_ptr free_conn = find_free_conn();
 
     return free_conn;
 }
 
-connection_ptr ConnPool::find_free_conn()
+db_connect_ptr ConnPool::find_free_conn()
 {
     auto it = find_if(m_conns.begin(), m_conns.end(),
                 [] (Conn& conn_)
@@ -149,7 +149,7 @@ connection_ptr ConnPool::find_free_conn()
     else if (m_active_conn < m_conn_max)
     {
 
-        connection_ptr new_conn_ptr = new_conn();
+        db_connect_ptr new_conn_ptr = new_conn();
 
         if (new_conn_ptr == nullptr)
             return nullptr;

@@ -4,6 +4,8 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/io_service.hpp>
 
+#include "Connection.hpp"
+
 using namespace boost::asio;
 using namespace std;
 
@@ -11,21 +13,33 @@ using namespace std;
 class Server
 {
 public:
-    Server (io_service&, unsigned short, unsigned short);
+    Server (unsigned short, unsigned short);
 
     void wait_login_accept();
 
     void wait_msgsvr_accept();
 
+    void run();
+
 private:
-    // socket for loginSvr
-    ip::tcp::socket     m_LoginSock;
+    int allocate_conn_id();
+
+
+private:
+    io_service m_io_service;
+
     // 监听loginSvr的连接
     ip::tcp::acceptor   m_LoginAcc;
-
-    ip::tcp::socket     m_MsgSock;
-
     ip::tcp::acceptor   m_MsgAcc;
+
+
+private:
+    connection_ptr m_login;
+    connection_ptr m_msgsvr;
+
+
+private:
+    static int g_count;
 };
 
 

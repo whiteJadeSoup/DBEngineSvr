@@ -4,22 +4,23 @@
 #include <cppconn/connection.h>
 
 
-typedef std::shared_ptr<sql::Connection> connection_ptr;
+typedef std::shared_ptr<sql::Connection> db_connect_ptr;
+
 class Conn
 {
 public:
-    Conn (connection_ptr );
+    Conn (db_connect_ptr );
 
     void set_use(bool);
     bool is_use();
 
-    void set_conn(connection_ptr);
-    connection_ptr get_conn();
+    void set_conn(db_connect_ptr);
+    db_connect_ptr get_conn();
 
     void close_conn();
 private:
 
-    connection_ptr m_conn;
+    db_connect_ptr m_conn;
     bool m_bInUse;      // 是否在使用中
 };
 

@@ -1,19 +1,19 @@
 
 #include "Conn.hpp"
 
-Conn::Conn(connection_ptr ptr_)
+Conn::Conn(db_connect_ptr ptr_)
   : m_conn(ptr_), m_bInUse(false)
 {
 
 }
 
 
-connection_ptr Conn::get_conn()
+db_connect_ptr Conn::get_conn()
 {
     return m_conn;
 }
 
-void Conn::set_conn(connection_ptr conn_ptr_)
+void Conn::set_conn(db_connect_ptr conn_ptr_)
 {
     m_conn = conn_ptr_;
 }

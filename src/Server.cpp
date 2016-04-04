@@ -2,29 +2,46 @@
 #include "Server.hpp"
 
 
-#include "LoginHandler.hpp"
-#include "MsgHandler.hpp"
+#include "LoginConn.hpp"
+#include "MsgConn.hpp"
 
 
 #include <memory>
 #include <iostream>
 
+
+
 using err_code = boost::system::error_code;
+
+
+int Server::g_count = 1;
+
 
 /**********************************************
  *
  *
  *
  */
-Server::Server(io_service& io_, unsigned short port_, unsigned short msg_port_)
-  :m_LoginSock(io_),
-   m_LoginAcc(io_, ip::tcp::endpoint(ip::tcp::v4(), port_)),
-   m_MsgSock(io_),
-   m_MsgAcc(io_, ip::tcp::endpoint(ip::tcp::v4(), msg_port_))
+Server::Server( unsigned short port_, unsigned short msg_port_)
+  :m_io_service(),
+   m_LoginAcc(m_io_service, ip::tcp::endpoint(ip::tcp::v4(), port_)),
+   m_MsgAcc(m_io_service, ip::tcp::endpoint(ip::tcp::v4(), msg_port_))
 
 {
     wait_login_accept();
     wait_msgsvr_accept();
+}
+
+
+void Server::run()
+{
+    m_io_service.run();
+}
+
+
+int Server::allocate_conn_id()
+{
+    return (g_count++) % 65535;
 }
 
 
@@ -36,17 +53,20 @@ Server::Server(io_service& io_, unsigned short port_, unsigned short msg_port_)
  */
 void Server::wait_login_accept()
 {
-    m_LoginAcc.async_accept(m_LoginSock, [this] (const err_code& ec)
+
+    m_login.reset(new LoginConn(m_io_service));
+
+    m_LoginAcc.async_accept(m_login->socket(), [this] (const err_code& ec)
         {
             if (!ec)
             {
                 std::cout << "connect loginsvr address: "
-                     << m_LoginSock.remote_endpoint().address().to_string()
+                     << m_login->socket().remote_endpoint().address().to_string()
                      << "connect loginsvr port: "
-                     << m_LoginSock.remote_endpoint().port() << std::endl;
+                     << m_login->socket().remote_endpoint().port() << std::endl;
 
-                // read to start
-                std::make_shared<LoginHandler>(std::move(m_LoginSock))->start();
+                int id = allocate_conn_id();
+                m_login->connect(id);
             }
             wait_login_accept();
         });
@@ -55,16 +75,19 @@ void Server::wait_login_accept()
 
 void Server::wait_msgsvr_accept()
 {
-    m_MsgAcc.async_accept(m_MsgSock, [this] (const err_code& ec)
+    m_msgsvr.reset(new MsgConn(m_io_service));
+
+    m_MsgAcc.async_accept(m_msgsvr->socket(), [this] (const err_code& ec)
         {
             if (!ec)
             {
                 cout << "msgsvr address: "
-                     << m_MsgSock.remote_endpoint().address().to_string()
+                     << m_msgsvr->socket().remote_endpoint().address().to_string()
                      << "msgsvr port: "
-                     << m_MsgSock.remote_endpoint().port() << endl;
+                     << m_msgsvr->socket().remote_endpoint().port() << endl;
 
-                make_shared<MsgHandler>(move(m_MsgSock))->start();
+                int id = allocate_conn_id();
+                m_msgsvr->connect(id);
             }
             wait_msgsvr_accept();
         });
