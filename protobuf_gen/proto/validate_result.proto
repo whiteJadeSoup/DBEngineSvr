@@ -1,0 +1,8 @@
+syntax = "proto3";
+package IM;
+
+message DBValidateResult
+{
+    int64 id = 1;
+    bool result = 2;
+}

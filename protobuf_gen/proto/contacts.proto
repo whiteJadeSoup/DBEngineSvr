@@ -1,0 +1,18 @@
+syntax="proto3";
+package IM;
+
+message Contacts
+{
+    int64 req_id = 1;		// 用户id
+    repeated User contacts = 2;	// 用户联系人列表
+}
+
+
+
+message User
+{
+    int64 id            = 1;
+    string name         = 2;
+    string nick_name    = 3;
+    string sex          = 4;
+}
