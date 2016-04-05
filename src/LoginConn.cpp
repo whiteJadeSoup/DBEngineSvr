@@ -55,19 +55,24 @@ void LoginConn::on_disconnect()
 
 void LoginConn::handle_UserValidate (pb_message_ptr p_msg_)
 {
-    GOOGLE_PROTOBUF_VERIFY_VERSION;
-    using namespace google::protobuf;
-
-    auto descriptor = p_msg_->GetDescriptor();
-    const Reflection* rf = p_msg_->GetReflection();
-    const FieldDescriptor* f_req_id = descriptor->FindFieldByName("id");
-    const FieldDescriptor* f_passwd = descriptor->FindFieldByName("passwd");
-
     try
     {
+        GOOGLE_PROTOBUF_VERIFY_VERSION;
+        using namespace google::protobuf;
+
+        auto descriptor = p_msg_->GetDescriptor();
+        const Reflection* rf = p_msg_->GetReflection();
+        const FieldDescriptor* f_req_id = descriptor->FindFieldByName("id");
+        const FieldDescriptor* f_passwd = descriptor->FindFieldByName("passwd");
+
+
+        assert(f_req_id && f_req_id->type()==FieldDescriptor::TYPE_INT64);
+        assert(f_passwd && f_passwd->type()==FieldDescriptor::TYPE_STRING);
+
+
+
         int64_t id = rf->GetInt64(*p_msg_, f_req_id);
         string passwd = rf->GetString(*p_msg_, f_passwd);
-
 
 
 
@@ -95,7 +100,4 @@ void LoginConn::handle_UserValidate (pb_message_ptr p_msg_)
         cout << "(" << __FUNCTION__ << ") on line " << __LINE__ << endl;
         cout << "# ERR: " << e.what() << endl;
     }
-
-
-
 }

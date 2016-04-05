@@ -67,17 +67,23 @@ void MsgConn::on_disconnect()
 
 void MsgConn::handle_read_user_info(pb_message_ptr p_msg_)
 {
-
-    GOOGLE_PROTOBUF_VERIFY_VERSION;
-    using namespace google::protobuf;
-
-    auto descriptor = p_msg_->GetDescriptor();
-    const Reflection* rf = p_msg_->GetReflection();
-    const FieldDescriptor* f_req_id = descriptor->FindFieldByName("id");
-
-
     try
     {
+
+
+        GOOGLE_PROTOBUF_VERIFY_VERSION;
+        using namespace google::protobuf;
+
+        auto descriptor = p_msg_->GetDescriptor();
+        const Reflection* rf = p_msg_->GetReflection();
+        const FieldDescriptor* f_req_id = descriptor->FindFieldByName("id");
+
+
+
+        assert(f_req_id && f_req_id->type()==FieldDescriptor::TYPE_INT64);
+
+
+
         int64_t id = rf->GetInt64(*p_msg_, f_req_id);
         cout << "req id: " << id << endl;
 
@@ -115,16 +121,20 @@ void MsgConn::handle_read_user_info(pb_message_ptr p_msg_)
 
 void MsgConn::handle_fetch_contacts(pb_message_ptr p_msg_)
 {
-    GOOGLE_PROTOBUF_VERIFY_VERSION;
-    using namespace google::protobuf;
-
-    auto descriptor = p_msg_->GetDescriptor();
-    const Reflection* rf = p_msg_->GetReflection();
-    const FieldDescriptor* f_req_id = descriptor->FindFieldByName("id");
-
-
     try
     {
+        GOOGLE_PROTOBUF_VERIFY_VERSION;
+        using namespace google::protobuf;
+
+        auto descriptor = p_msg_->GetDescriptor();
+        const Reflection* rf = p_msg_->GetReflection();
+        const FieldDescriptor* f_req_id = descriptor->FindFieldByName("id");
+
+
+        assert(f_req_id && f_req_id->type() == FieldDescriptor::TYPE_INT64);
+
+
+
         int64_t id = rf->GetInt64(*p_msg_, f_req_id);
         cout << "req id: " << id << endl;
 
