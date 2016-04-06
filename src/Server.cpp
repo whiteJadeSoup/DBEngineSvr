@@ -4,7 +4,7 @@
 
 #include "LoginConn.hpp"
 #include "MsgConn.hpp"
-
+#include "RouterConn.hpp"
 
 #include <memory>
 #include <iostream>
@@ -22,14 +22,16 @@ int Server::g_count = 1;
  *
  *
  */
-Server::Server( unsigned short port_, unsigned short msg_port_)
+Server::Server( unsigned short port_, unsigned short msg_port_, unsigned short router_port_)
   :m_io_service(),
    m_LoginAcc(m_io_service, ip::tcp::endpoint(ip::tcp::v4(), port_)),
-   m_MsgAcc(m_io_service, ip::tcp::endpoint(ip::tcp::v4(), msg_port_))
+   m_MsgAcc(m_io_service, ip::tcp::endpoint(ip::tcp::v4(), msg_port_)),
+   m_routerAcc(m_io_service, ip::tcp::endpoint(ip::tcp::v4(), router_port_))
 
 {
     wait_login_accept();
     wait_msgsvr_accept();
+    wait_router_accept();
 }
 
 
@@ -90,6 +92,28 @@ void Server::wait_msgsvr_accept()
                 m_msgsvr->connect(id);
             }
             wait_msgsvr_accept();
+        });
+
+}
+
+
+void Server::wait_router_accept()
+{
+    m_router.reset(new RouterConn(m_io_service));
+
+    m_routerAcc.async_accept(m_router->socket(), [this] (const err_code& ec)
+        {
+            if (!ec)
+            {
+                cout << "Router address: "
+                     << m_router->socket().remote_endpoint().address().to_string()
+                     << "Router port: "
+                     << m_router->socket().remote_endpoint().port() << endl;
+
+                int id = allocate_conn_id();
+                m_router->connect(id);
+            }
+            wait_router_accept();
         });
 
 }

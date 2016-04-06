@@ -29,6 +29,8 @@ private:
     void handle_read_user_info(pb_message_ptr);
     // 获取联系人列表
     void handle_fetch_contacts(pb_message_ptr);
+    // 获取离线消息
+    void handle_fetch_offline_message(pb_message_ptr);
 
 
 private:

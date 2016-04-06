@@ -4,11 +4,14 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <google/protobuf/message.h>
 #include <mysql_connection.h>
 
 
 using namespace std;
 typedef shared_ptr<sql::Connection> db_connect_ptr;
+typedef shared_ptr<google::protobuf::Message> pb_message_ptr;
+
 
 class SQLhandler
 {
@@ -19,6 +22,10 @@ public:
     bool read_info(db_connect_ptr, int64_t, vector<string>&);
     //  读取联系信息
     bool read_contacts(db_connect_ptr, int64_t, vector<string>&);
+    // 保存离线消息
+    bool save_offline_message(db_connect_ptr, vector<string>&);
+    // 读取离线消息
+    bool read_offline_message(db_connect_ptr, int64_t, vector<string>&);
 
 private:
 };

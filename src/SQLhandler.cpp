@@ -176,6 +176,98 @@ bool SQLhandler::read_contacts(db_connect_ptr conn_, int64_t user_id_, vector<st
 
 
 
+bool SQLhandler::save_offline_message(db_connect_ptr conn_, vector<string>& vPassData)
+{
+    try
+    {
+        if (!conn_->isValid())
+        {
+            cout << "conn is invalid!" << endl;
+            return false;
+        }
+
+
+        int64_t send_id = stoi(vPassData[0]);
+        int64_t recv_id = stoi(vPassData[1]);
+        string content = move(vPassData[2]);
+
+
+
+        // 数据库
+        conn_->setSchema("account");
+
+        // 获得联系人列表
+        sql::PreparedStatement* prep_stmt = conn_->prepareStatement(
+          "insert into t_offline_message(send_id, recv_id, content) values(?,?,?)");
+
+        prep_stmt->setInt(1, send_id);
+        prep_stmt->setInt(2, recv_id);
+        prep_stmt->setString(3, content);
+
+        prep_stmt->execute();
+
+
+        delete prep_stmt;
+
+        return true;
+
+    }
+    catch (sql::SQLException& e)
+    {
+        cout << "# ERR: SQLException in " << __FILE__;
+        cout << "(" << __FUNCTION__ << ") on line " << __LINE__ << endl;
+        cout << "# ERR: " << e.what();
+        cout << " (MySQL error code: " << e.getErrorCode();
+        cout << ", SQLState: " << e.getSQLState() << " )" << endl;
+        return false;
+    }
+}
+
+
+
+bool SQLhandler::read_offline_message(db_connect_ptr conn_, int64_t req_id, vector<string>& vResult)
+{
+    try
+    {
+        if (!conn_->isValid())
+        {
+            cout << "conn is invalid!" << endl;
+            return false;
+        }
+
+        // 数据库
+        conn_->setSchema("account");
+
+        // 获得联系人列表
+        sql::PreparedStatement* prep_stmt = conn_->prepareStatement(
+          "select send_id, content from t_offline_message where recv_id = ?");
+
+        prep_stmt->setInt(1, req_id);
+
+        sql::ResultSet* res = prep_stmt->executeQuery();
+        while (res->next())
+        {
+            vResult.push_back(res->getString("send_id"));
+            vResult.push_back(res->getString("content"));
+        }
+
+
+        delete prep_stmt;
+        delete res;
+        return true;
+
+    }
+    catch (sql::SQLException& e)
+    {
+        cout << "# ERR: SQLException in " << __FILE__;
+        cout << "(" << __FUNCTION__ << ") on line " << __LINE__ << endl;
+        cout << "# ERR: " << e.what();
+        cout << " (MySQL error code: " << e.getErrorCode();
+        cout << ", SQLState: " << e.getSQLState() << " )" << endl;
+        return false;
+    }
+}
+
 
 
 

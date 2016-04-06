@@ -50,7 +50,7 @@ enum class M2D
      * @return    name        : 玩家名称
      * @return    nick_name   : 玩家昵称
      */
-    READ_INFO                       = 5000,
+    READ_INFO                           = 5000,
 
     /*
      * 请求联系人列表
@@ -63,9 +63,38 @@ enum class M2D
      *              string  nick_name   // 昵称
      *          ]
      */
-     FETCH_CONTACTS                 = 5001,
+     FETCH_CONTACTS                     = 5001,
+
+    /*
+     * 请求离线消息
+     * @parm    user_id
+     * @return  int 总消息数,
+     *          循环
+     *          [
+     *              int     id,         // 发送者id
+     *              string  content,       // 内容
+     *          ]
+     */
+     FETCH_OFFLINE_MESSAGE              = 5002,
 
 };
+
+
+
+
+// 数据库服务器与路由服务器消息定义
+enum class R2D
+{
+    /*
+     *  添加一条离线消息
+     * @parm send_id    : 发送者id
+     * @parm recv_id    : 接受者id
+     * @parm content    : 聊天内容
+     */
+
+    ADD_OFFLINE_MESSAGE     = 4000,
+};
+
 
 
 

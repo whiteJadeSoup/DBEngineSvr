@@ -13,11 +13,14 @@ using namespace std;
 class Server
 {
 public:
-    Server (unsigned short, unsigned short);
+    Server (unsigned short, unsigned short, unsigned short);
 
+    // 等待loginsvr连接
     void wait_login_accept();
-
+    // 等待msgsvr连接
     void wait_msgsvr_accept();
+    // 等待routersvr连接
+    void wait_router_accept();
 
     void run();
 
@@ -31,12 +34,12 @@ private:
     // 监听loginSvr的连接
     ip::tcp::acceptor   m_LoginAcc;
     ip::tcp::acceptor   m_MsgAcc;
-
+    ip::tcp::acceptor   m_routerAcc;
 
 private:
     connection_ptr m_login;
     connection_ptr m_msgsvr;
-
+    connection_ptr m_router;
 
 private:
     static int g_count;
