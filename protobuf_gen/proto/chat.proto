@@ -1,0 +1,9 @@
+syntax="proto3";
+package IM;
+
+message ChatPkt
+{
+    int64 send_id = 1;
+    int64 recv_id = 2;
+    string content = 3;
+}
