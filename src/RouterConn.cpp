@@ -73,21 +73,27 @@ void RouterConn::handle_offline_message(pb_message_ptr p_msg_)
         const FieldDescriptor* f_send_id = descriptor->FindFieldByName("send_id");
         const FieldDescriptor* f_recv_id = descriptor->FindFieldByName("recv_id");
         const FieldDescriptor* f_content = descriptor->FindFieldByName("content");
+        const FieldDescriptor* f_send_tm = descriptor->FindFieldByName("send_time");
 
 
         assert(f_send_id && f_send_id->type()==FieldDescriptor::TYPE_INT64);
         assert(f_recv_id && f_recv_id->type()==FieldDescriptor::TYPE_INT64);
         assert(f_content && f_content->type()==FieldDescriptor::TYPE_STRING);
+        assert(f_send_tm && f_send_tm->type()==FieldDescriptor::TYPE_STRING);
 
-        int64_t send_id = rf->GetInt64(*p_msg_, f_send_id);
-        int64_t recv_id = rf->GetInt64(*p_msg_, f_recv_id);
-        string content = rf->GetString(*p_msg_, f_content);
+
+
+        int64_t send_id = rf->GetInt64(*p_msg_,  f_send_id);
+        int64_t recv_id = rf->GetInt64(*p_msg_,  f_recv_id);
+        string  content = rf->GetString(*p_msg_, f_content);
+        string  send_tm = rf->GetString(*p_msg_, f_send_tm);
 
 
         vector<string> vPassData;
         vPassData.push_back(to_string(send_id));
         vPassData.push_back(to_string(recv_id));
         vPassData.push_back(content);
+        vPassData.push_back(send_tm);
 
 
         db_connect_ptr free_conn = ConnPool::get_instance()->get_free_conn();

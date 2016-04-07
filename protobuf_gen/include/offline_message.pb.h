@@ -205,6 +205,17 @@ class OfflineMessage : public ::google::protobuf::Message {
   ::std::string* release_content();
   void set_allocated_content(::std::string* content);
 
+  // optional string send_time = 3;
+  void clear_send_time();
+  static const int kSendTimeFieldNumber = 3;
+  const ::std::string& send_time() const;
+  void set_send_time(const ::std::string& value);
+  void set_send_time(const char* value);
+  void set_send_time(const char* value, size_t size);
+  ::std::string* mutable_send_time();
+  ::std::string* release_send_time();
+  void set_allocated_send_time(::std::string* send_time);
+
   // @@protoc_insertion_point(class_scope:IM.OfflineMessage)
  private:
 
@@ -212,6 +223,7 @@ class OfflineMessage : public ::google::protobuf::Message {
   bool _is_default_instance_;
   ::google::protobuf::int64 send_id_;
   ::google::protobuf::internal::ArenaStringPtr content_;
+  ::google::protobuf::internal::ArenaStringPtr send_time_;
   mutable int _cached_size_;
   friend void  protobuf_AddDesc_offline_5fmessage_2eproto();
   friend void protobuf_AssignDesc_offline_5fmessage_2eproto();
@@ -331,6 +343,49 @@ inline void OfflineMessage::set_allocated_content(::std::string* content) {
   }
   content_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), content);
   // @@protoc_insertion_point(field_set_allocated:IM.OfflineMessage.content)
+}
+
+// optional string send_time = 3;
+inline void OfflineMessage::clear_send_time() {
+  send_time_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& OfflineMessage::send_time() const {
+  // @@protoc_insertion_point(field_get:IM.OfflineMessage.send_time)
+  return send_time_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void OfflineMessage::set_send_time(const ::std::string& value) {
+  
+  send_time_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:IM.OfflineMessage.send_time)
+}
+inline void OfflineMessage::set_send_time(const char* value) {
+  
+  send_time_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:IM.OfflineMessage.send_time)
+}
+inline void OfflineMessage::set_send_time(const char* value, size_t size) {
+  
+  send_time_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:IM.OfflineMessage.send_time)
+}
+inline ::std::string* OfflineMessage::mutable_send_time() {
+  
+  // @@protoc_insertion_point(field_mutable:IM.OfflineMessage.send_time)
+  return send_time_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* OfflineMessage::release_send_time() {
+  
+  return send_time_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void OfflineMessage::set_allocated_send_time(::std::string* send_time) {
+  if (send_time != NULL) {
+    
+  } else {
+    
+  }
+  send_time_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), send_time);
+  // @@protoc_insertion_point(field_set_allocated:IM.OfflineMessage.send_time)
 }
 
 #endif  // !PROTOBUF_INLINE_NOT_IN_HEADERS

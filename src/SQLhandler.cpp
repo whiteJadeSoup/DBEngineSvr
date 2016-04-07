@@ -190,7 +190,7 @@ bool SQLhandler::save_offline_message(db_connect_ptr conn_, vector<string>& vPas
         int64_t send_id = stoi(vPassData[0]);
         int64_t recv_id = stoi(vPassData[1]);
         string content = move(vPassData[2]);
-
+        string send_tm = move(vPassData[3]);
 
 
         // 数据库
@@ -198,11 +198,12 @@ bool SQLhandler::save_offline_message(db_connect_ptr conn_, vector<string>& vPas
 
         // 获得联系人列表
         sql::PreparedStatement* prep_stmt = conn_->prepareStatement(
-          "insert into t_offline_message(send_id, recv_id, content) values(?,?,?)");
+          "insert into t_offline_message(send_id, recv_id, content, send_time) values(?,?,?,?)");
 
         prep_stmt->setInt(1, send_id);
         prep_stmt->setInt(2, recv_id);
         prep_stmt->setString(3, content);
+        prep_stmt->setString(4, send_tm);
 
         prep_stmt->execute();
 
@@ -240,7 +241,7 @@ bool SQLhandler::read_offline_message(db_connect_ptr conn_, int64_t req_id, vect
 
         // 获得联系人列表
         sql::PreparedStatement* prep_stmt = conn_->prepareStatement(
-          "select send_id, content from t_offline_message where recv_id = ?");
+          "select send_id, content, send_time from t_offline_message where recv_id = ?");
 
         prep_stmt->setInt(1, req_id);
 
@@ -249,6 +250,7 @@ bool SQLhandler::read_offline_message(db_connect_ptr conn_, int64_t req_id, vect
         {
             vResult.push_back(res->getString("send_id"));
             vResult.push_back(res->getString("content"));
+            vResult.push_back(res->getString("send_time"));
         }
 
 

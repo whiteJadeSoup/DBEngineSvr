@@ -206,17 +206,18 @@ void MsgConn::handle_fetch_offline_message(pb_message_ptr p_msg_)
         IM::OfflineCach offlineCach;
         offlineCach.set_user_id(id);
 
-        if (result.size() < 2)
+        if (result.size() < 3)
         {
-            cout << "error! size < 2! req_id: " << id << endl;
+            cout << "error! size < 3! req_id: " << id << endl;
             return ;
         }
 
-        for(int i = 0; i < result.size(); i += 2)
+        for(int i = 0; i < result.size(); i += 3)
         {
             IM::OfflineMessage* pMessage = offlineCach.add_messages();
             pMessage->set_send_id((int64_t)(stoi(result[i])));
             pMessage->set_content(result[i+1]);
+            pMessage->set_send_time(result[i+2]);
         }
 
         // release conn

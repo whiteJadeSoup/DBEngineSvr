@@ -11,6 +11,7 @@ message OfflineCach
 
 message OfflineMessage
 {
-    int64 send_id			= 1; // 发送者id
-    string content			= 2; // 离线内容
+    int64 	send_id			= 1; // 发送者id
+    string 	content			= 2; // 离线内容
+    string	send_time		= 3; // 发送时间
 }
