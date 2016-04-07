@@ -35,10 +35,11 @@ void protobuf_AssignDesc_chat_2eproto() {
       "chat.proto");
   GOOGLE_CHECK(file != NULL);
   ChatPkt_descriptor_ = file->message_type(0);
-  static const int ChatPkt_offsets_[3] = {
+  static const int ChatPkt_offsets_[4] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ChatPkt, send_id_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ChatPkt, recv_id_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ChatPkt, content_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ChatPkt, send_time_),
   };
   ChatPkt_reflection_ =
     ::google::protobuf::internal::GeneratedMessageReflection::NewGeneratedMessageReflection(
@@ -81,9 +82,9 @@ void protobuf_AddDesc_chat_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-    "\n\nchat.proto\022\002IM\"<\n\007ChatPkt\022\017\n\007send_id\030\001"
-    " \001(\003\022\017\n\007recv_id\030\002 \001(\003\022\017\n\007content\030\003 \001(\tb\006"
-    "proto3", 86);
+    "\n\nchat.proto\022\002IM\"O\n\007ChatPkt\022\017\n\007send_id\030\001"
+    " \001(\003\022\017\n\007recv_id\030\002 \001(\003\022\017\n\007content\030\003 \001(\t\022\021"
+    "\n\tsend_time\030\004 \001(\tb\006proto3", 105);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "chat.proto", &protobuf_RegisterTypes);
   ChatPkt::default_instance_ = new ChatPkt();
@@ -114,6 +115,7 @@ static void MergeFromFail(int line) {
 const int ChatPkt::kSendIdFieldNumber;
 const int ChatPkt::kRecvIdFieldNumber;
 const int ChatPkt::kContentFieldNumber;
+const int ChatPkt::kSendTimeFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 ChatPkt::ChatPkt()
@@ -141,6 +143,7 @@ void ChatPkt::SharedCtor() {
   send_id_ = GOOGLE_LONGLONG(0);
   recv_id_ = GOOGLE_LONGLONG(0);
   content_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  send_time_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
 ChatPkt::~ChatPkt() {
@@ -150,6 +153,7 @@ ChatPkt::~ChatPkt() {
 
 void ChatPkt::SharedDtor() {
   content_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  send_time_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (this != default_instance_) {
   }
 }
@@ -190,6 +194,7 @@ void ChatPkt::Clear() {
 
   ZR_(send_id_, recv_id_);
   content_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  send_time_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 
 #undef ZR_HELPER_
 #undef ZR_
@@ -248,6 +253,23 @@ bool ChatPkt::MergePartialFromCodedStream(
         } else {
           goto handle_unusual;
         }
+        if (input->ExpectTag(34)) goto parse_send_time;
+        break;
+      }
+
+      // optional string send_time = 4;
+      case 4: {
+        if (tag == 34) {
+         parse_send_time:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_send_time()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->send_time().data(), this->send_time().length(),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "IM.ChatPkt.send_time"));
+        } else {
+          goto handle_unusual;
+        }
         if (input->ExpectAtEnd()) goto success;
         break;
       }
@@ -296,6 +318,16 @@ void ChatPkt::SerializeWithCachedSizes(
       3, this->content(), output);
   }
 
+  // optional string send_time = 4;
+  if (this->send_time().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->send_time().data(), this->send_time().length(),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "IM.ChatPkt.send_time");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      4, this->send_time(), output);
+  }
+
   // @@protoc_insertion_point(serialize_end:IM.ChatPkt)
 }
 
@@ -321,6 +353,17 @@ void ChatPkt::SerializeWithCachedSizes(
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
         3, this->content(), target);
+  }
+
+  // optional string send_time = 4;
+  if (this->send_time().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->send_time().data(), this->send_time().length(),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "IM.ChatPkt.send_time");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        4, this->send_time(), target);
   }
 
   // @@protoc_insertion_point(serialize_to_array_end:IM.ChatPkt)
@@ -349,6 +392,13 @@ int ChatPkt::ByteSize() const {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::StringSize(
         this->content());
+  }
+
+  // optional string send_time = 4;
+  if (this->send_time().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->send_time());
   }
 
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
@@ -381,6 +431,10 @@ void ChatPkt::MergeFrom(const ChatPkt& from) {
 
     content_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.content_);
   }
+  if (from.send_time().size() > 0) {
+
+    send_time_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.send_time_);
+  }
 }
 
 void ChatPkt::CopyFrom(const ::google::protobuf::Message& from) {
@@ -408,6 +462,7 @@ void ChatPkt::InternalSwap(ChatPkt* other) {
   std::swap(send_id_, other->send_id_);
   std::swap(recv_id_, other->recv_id_);
   content_.Swap(&other->content_);
+  send_time_.Swap(&other->send_time_);
   _internal_metadata_.Swap(&other->_internal_metadata_);
   std::swap(_cached_size_, other->_cached_size_);
 }
@@ -492,6 +547,49 @@ void ChatPkt::clear_content() {
   }
   content_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), content);
   // @@protoc_insertion_point(field_set_allocated:IM.ChatPkt.content)
+}
+
+// optional string send_time = 4;
+void ChatPkt::clear_send_time() {
+  send_time_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ const ::std::string& ChatPkt::send_time() const {
+  // @@protoc_insertion_point(field_get:IM.ChatPkt.send_time)
+  return send_time_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void ChatPkt::set_send_time(const ::std::string& value) {
+  
+  send_time_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:IM.ChatPkt.send_time)
+}
+ void ChatPkt::set_send_time(const char* value) {
+  
+  send_time_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:IM.ChatPkt.send_time)
+}
+ void ChatPkt::set_send_time(const char* value, size_t size) {
+  
+  send_time_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:IM.ChatPkt.send_time)
+}
+ ::std::string* ChatPkt::mutable_send_time() {
+  
+  // @@protoc_insertion_point(field_mutable:IM.ChatPkt.send_time)
+  return send_time_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ ::std::string* ChatPkt::release_send_time() {
+  
+  return send_time_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void ChatPkt::set_allocated_send_time(::std::string* send_time) {
+  if (send_time != NULL) {
+    
+  } else {
+    
+  }
+  send_time_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), send_time);
+  // @@protoc_insertion_point(field_set_allocated:IM.ChatPkt.send_time)
 }
 
 #endif  // PROTOBUF_INLINE_NOT_IN_HEADERS
