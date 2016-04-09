@@ -196,9 +196,9 @@ bool SQLhandler::save_offline_message(db_connect_ptr conn_, vector<string>& vPas
         // 数据库
         conn_->setSchema("account");
 
-        // 获得联系人列表
+        // 保存离线消息
         sql::PreparedStatement* prep_stmt = conn_->prepareStatement(
-          "insert into t_offline_message(send_id, recv_id, content, send_time) values(?,?,?,?)");
+          "insert into t_message(send_id, recv_id, content, send_time, flag) values(?,?,?,?,0)");
 
         prep_stmt->setInt(1, send_id);
         prep_stmt->setInt(2, recv_id);
@@ -239,9 +239,9 @@ bool SQLhandler::read_offline_message(db_connect_ptr conn_, int64_t req_id, vect
         // 数据库
         conn_->setSchema("account");
 
-        // 获得联系人列表
+        // 获得离线消息
         sql::PreparedStatement* prep_stmt = conn_->prepareStatement(
-          "select send_id, content, send_time from t_offline_message where recv_id = ?");
+          "select send_id, content, send_time from t_message where recv_id = ? and flag = 0");
 
         prep_stmt->setInt(1, req_id);
 
@@ -271,6 +271,62 @@ bool SQLhandler::read_offline_message(db_connect_ptr conn_, int64_t req_id, vect
 }
 
 
+
+
+bool SQLhandler::save_to_history(db_connect_ptr conn_, int64_t recv_id_, vector<string>& vPassData)
+{
+
+    try
+    {
+        if (!conn_->isValid())
+        {
+            cout << "conn is invalid!" << endl;
+            return false;
+        }
+
+        // 数据库
+        conn_->setSchema("account");
+
+        // 获得联系人列表
+        sql::PreparedStatement* prep_delete_stmt = conn_->prepareStatement(
+          "delete from t_message where recv_id = ? and send_id = ? and flag = 0");
+
+        sql::PreparedStatement* prep_insert_stmt = conn_->prepareStatement(
+          "insert into t_message(recv_id, send_id, content, send_time, flag) values(?,?,?,?,1)");
+
+
+        // 先删除离线消息
+        for(int i = 0; i < vPassData.size(); i +=3)
+        {
+            prep_delete_stmt->setInt(1, recv_id_);
+            prep_delete_stmt->setInt(2, stoi(vPassData[i]));
+
+            prep_delete_stmt->execute();
+        }
+
+
+
+        // 新增历史消息
+        for(int i = 0; i < vPassData.size(); i +=3)
+        {
+            prep_insert_stmt->setInt(1, recv_id_);
+            prep_insert_stmt->setInt(2, stoi(vPassData[i]));
+            prep_insert_stmt->setString(3, vPassData[i+1]);
+            prep_insert_stmt->setString(4, vPassData[i+2]);
+
+            prep_insert_stmt->execute();
+        }
+
+
+    }
+    catch (exception& e)
+    {
+        cout << "# ERR: exception in " << __FILE__;
+        cout << "(" << __FUNCTION__ << ") on line " << __LINE__ << endl;
+        cout << "# ERR: " << e.what() << endl;
+    }
+
+}
 
 
 

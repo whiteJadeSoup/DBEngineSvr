@@ -77,6 +77,10 @@ enum class M2D
      */
      FETCH_OFFLINE_MESSAGE              = 5002,
 
+     /*
+      *  保存历史信息
+      */
+     SAVE_TO_HISTORY                    = 5003,
 };
 
 

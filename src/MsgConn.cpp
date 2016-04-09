@@ -8,10 +8,10 @@
 
 #include "login.pb.h"
 #include "contacts.pb.h"
-#include "offline_message.pb.h"
+#include "message_cach.pb.h"
 
 #include <iostream>
-
+#include <google/protobuf/repeated_field.h>
 
 
 MsgConn::MsgConn(io_service& io_)
@@ -35,7 +35,8 @@ void MsgConn::on_connect()
     m_dispatcher.register_message_callback((int)M2D::FETCH_OFFLINE_MESSAGE,
         bind(&MsgConn::handle_fetch_offline_message, this, std::placeholders::_1));
 
-
+    m_dispatcher.register_message_callback((int)M2D::SAVE_TO_HISTORY,
+        bind(&MsgConn::handle_save_history, this, std::placeholders::_1));
 
     // connection pool init
     read_head();
@@ -203,8 +204,8 @@ void MsgConn::handle_fetch_offline_message(pb_message_ptr p_msg_)
         m_sql_handler.read_offline_message(conn, id, result);
 
 
-        IM::OfflineCach offlineCach;
-        offlineCach.set_user_id(id);
+        IM::MessageCach MessageCach;
+        MessageCach.set_user_id(id);
 
         if (result.size() < 3)
         {
@@ -214,7 +215,7 @@ void MsgConn::handle_fetch_offline_message(pb_message_ptr p_msg_)
 
         for(int i = 0; i < result.size(); i += 3)
         {
-            IM::OfflineMessage* pMessage = offlineCach.add_messages();
+            IM::ChatPkt *pMessage = MessageCach.add_chat_message();
             pMessage->set_send_id((int64_t)(stoi(result[i])));
             pMessage->set_content(result[i+1]);
             pMessage->set_send_time(result[i+2]);
@@ -224,7 +225,7 @@ void MsgConn::handle_fetch_offline_message(pb_message_ptr p_msg_)
         ConnPool::get_instance()->release_conn(conn);
 
         CMsg packet;
-        packet.encode((int)M2D::FETCH_OFFLINE_MESSAGE, offlineCach);
+        packet.encode((int)M2D::FETCH_OFFLINE_MESSAGE, MessageCach);
         send(packet);
     }
     catch (exception& e)
@@ -237,6 +238,59 @@ void MsgConn::handle_fetch_offline_message(pb_message_ptr p_msg_)
 }
 
 
+
+void MsgConn::handle_save_history(pb_message_ptr p_msg_)
+{
+    try
+    {
+        GOOGLE_PROTOBUF_VERIFY_VERSION;
+        using namespace google::protobuf;
+
+        auto descriptor = p_msg_->GetDescriptor();
+        const Reflection* rf = p_msg_->GetReflection();
+        const FieldDescriptor* f_req_id  = descriptor->FindFieldByName("user_id");
+        const FieldDescriptor* f_message = descriptor->FindFieldByName("chat_message");
+
+
+        assert(f_req_id  && f_req_id->type() == FieldDescriptor::TYPE_INT64);
+        assert(f_message && f_message->is_repeated());
+
+
+        int64_t recv_id = rf->GetInt64(*p_msg_, f_req_id);
+
+
+        vector<string> vPassData;
+        RepeatedPtrField<IM::ChatPkt> chat_messages = rf->GetRepeatedPtrField<IM::ChatPkt>(*p_msg_, f_message);
+
+//
+        auto it = chat_messages.begin();
+        for(; it != chat_messages.end(); ++it)
+        {
+            int64_t send_id = it->send_id();
+            string content  = it->content();
+            string send_tm  = it->send_time();
+
+
+            vPassData.push_back(to_string(send_id));
+            vPassData.push_back(move(content));
+            vPassData.push_back(move(send_tm));
+        }
+
+
+        db_connect_ptr conn = ConnPool::get_instance()->get_free_conn();
+        m_sql_handler.save_to_history(conn, recv_id, vPassData);
+
+
+        // release conn
+        ConnPool::get_instance()->release_conn(conn);
+    }
+    catch (exception& e)
+    {
+        cout << "# ERR: exception in " << __FILE__;
+        cout << "(" << __FUNCTION__ << ") on line " << __LINE__ << endl;
+        cout << "# ERR: " << e.what() << endl;
+    }
+}
 
 
 

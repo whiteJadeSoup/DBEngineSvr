@@ -26,6 +26,8 @@ public:
     bool save_offline_message(db_connect_ptr, vector<string>&);
     // 读取离线消息
     bool read_offline_message(db_connect_ptr, int64_t, vector<string>&);
+    // 将离线消息改为历史消息
+    bool save_to_history(db_connect_ptr conn_, int64_t, vector<string>&);
 
 private:
 };
