@@ -33,6 +33,10 @@ private:
     void handle_fetch_offline_message(pb_message_ptr);
     // 保存历史信息
     void handle_save_history(pb_message_ptr);
+    // 读取频道信息
+    void handle_fetch_channels(pb_message_ptr);
+    // 加入频道
+    void handle_join_channel(pb_message_ptr);
 
 private:
     SQLhandler m_sql_handler;

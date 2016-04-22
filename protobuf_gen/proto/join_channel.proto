@@ -1,0 +1,9 @@
+syntax="proto3";
+package IM;
+
+message JoinChannel
+{
+	int64	user_id 	= 1;			// 请求加入的用户id
+	int32 	channel_id	= 2;			// 请求要加入的频道id
+	int32   result		= 3;			// 加入结果。 请求时不设置这个域
+}

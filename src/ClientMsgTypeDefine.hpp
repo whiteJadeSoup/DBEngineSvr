@@ -50,7 +50,7 @@ enum class M2D
      * @return    name        : 玩家名称
      * @return    nick_name   : 玩家昵称
      */
-    READ_INFO                           = 5000,
+    READ_INFO                               = 5000,
 
     /*
      * 请求联系人列表
@@ -63,7 +63,7 @@ enum class M2D
      *              string  nick_name   // 昵称
      *          ]
      */
-     FETCH_CONTACTS                     = 5001,
+     FETCH_CONTACTS                         = 5001,
 
     /*
      * 请求离线消息
@@ -75,12 +75,23 @@ enum class M2D
      *              string  content,       // 内容
      *          ]
      */
-     FETCH_OFFLINE_MESSAGE              = 5002,
+     FETCH_OFFLINE_MESSAGE                  = 5002,
 
      /*
       *  保存历史信息
       */
-     SAVE_TO_HISTORY                    = 5003,
+     SAVE_TO_HISTORY                        = 5003,
+
+
+     /*
+      * 读取频道信息
+      */
+     FETCH_CHANNELS                         = 5010,
+
+     /*
+      * 请求加入频道
+      */
+     JOIN_CHANNEL                           = 5011,
 };
 
 

@@ -1,0 +1,20 @@
+syntax = "proto3";
+package IM;
+
+
+import "contacts.proto";
+
+// 频道集合
+message ChannelVec
+{
+    repeated Channel channels = 1;
+}
+
+
+// 单个频道实体
+message Channel
+{
+    int32 	id 	= 1;		// 频道id				
+    string 	name 	= 2;		// 频道名称
+    repeated User user  = 3;		// 加入该频道的玩家
+}

@@ -331,8 +331,118 @@ bool SQLhandler::save_to_history(db_connect_ptr conn_, int64_t recv_id_, vector<
 
 
 
+bool SQLhandler::read_channels(db_connect_ptr conn_, vector<string>& vResult)
+{
+    try
+    {
+        if (!conn_->isValid())
+        {
+            cout << "conn is invalid!" << endl;
+            return false;
+        }
+
+        // 数据库
+        conn_->setSchema("account");
+
+        // 获得频道列表
+        sql::PreparedStatement* prep_channels_stmt = conn_->prepareStatement(
+          "select i_id,s_name from t_channel");
+        // 获得所属指定频道的玩家
+        sql::PreparedStatement* prep_users_stmt = conn_->prepareStatement(
+          "select i_user_id from t_channel_member where i_channel_id=?");
 
 
+
+        sql::ResultSet* res = prep_channels_stmt->executeQuery();
+        vector<string> vUserInfo;
+
+        while (res->next())
+        {
+            int nChannelId = stoi(res->getString("i_id"));
+            string channel_name = res->getString("s_name");
+
+            vResult.push_back(to_string(nChannelId));
+            vResult.push_back(channel_name);
+
+
+            // 查询频道成员
+            prep_users_stmt->setInt(1, nChannelId);
+            sql::ResultSet* user_res = prep_users_stmt->executeQuery();
+
+
+            // 成员数
+            int nRowCount = user_res->rowsCount();
+            vResult.push_back(to_string(nRowCount));
+
+            while(user_res->next())
+            {
+                vUserInfo.clear();
+
+                // 获取指定玩家信息
+                int64_t user_id = (int64_t)stoi(user_res->getString("i_user_id"));
+                read_info(conn_, user_id, vUserInfo);
+
+
+                vResult.push_back(to_string(user_id));
+                copy(vUserInfo.begin(), vUserInfo.end(), back_inserter(vResult));
+            }
+
+            delete user_res;
+        }
+
+        delete res;
+        delete prep_channels_stmt;
+        delete prep_users_stmt;
+
+    }
+    catch (exception& e)
+    {
+        cout << "# ERR: exception in " << __FILE__;
+        cout << "(" << __FUNCTION__ << ") on line " << __LINE__ << endl;
+        cout << "# ERR: " << e.what() << endl;
+    }
+}
+
+
+
+bool SQLhandler::join_channel(db_connect_ptr conn_, vector<string>& vPassData, vector<string>& vResult)
+{
+    try
+    {
+        if (!conn_->isValid())
+        {
+            cout << "conn is invalid!" << endl;
+            return false;
+        }
+
+        // 数据库
+        conn_->setSchema("account");
+
+
+        sql::PreparedStatement* prep_insert_stmt = conn_->prepareStatement(
+          "insert into t_channel_member(i_channel_id, i_user_id, d_join_time ) values(?,?,now())");
+
+
+        int64_t user_id         = (int64_t)stoi(vPassData[0]);
+        int32_t channel_id      = (int32_t)stoi(vPassData[1]);
+
+
+        prep_insert_stmt->setInt(1, channel_id);
+        prep_insert_stmt->setInt(2, user_id);
+
+        bool result = prep_insert_stmt->execute();
+
+        vResult.push_back( result ? "1" : "0" );
+
+    }
+    catch (exception& e)
+    {
+        cout << "# ERR: exception in " << __FILE__;
+        cout << "(" << __FUNCTION__ << ") on line " << __LINE__ << endl;
+        cout << "# ERR: " << e.what() << endl;
+    }
+
+}
 
 
 
