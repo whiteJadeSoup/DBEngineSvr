@@ -10,7 +10,7 @@
 #include "contacts.pb.h"
 #include "message_cach.pb.h"
 #include "channel.pb.h"
-
+#include "user_update.pb.h"
 
 
 #include <iostream>
@@ -42,11 +42,16 @@ void MsgConn::on_connect()
         bind(&MsgConn::handle_save_history,             this, std::placeholders::_1));
 
     m_dispatcher.register_message_callback((int)M2D::FETCH_CHANNELS,
-        bind(&MsgConn::handle_fetch_channels,          this, std::placeholders::_1));
+        bind(&MsgConn::handle_fetch_channels,           this, std::placeholders::_1));
 
     m_dispatcher.register_message_callback((int)M2D::JOIN_CHANNEL,
-        bind(&MsgConn::handle_join_channel,            this, std::placeholders::_1));
+        bind(&MsgConn::handle_join_channel,             this, std::placeholders::_1));
 
+    m_dispatcher.register_message_callback((int)M2D::EXIT_CHANNEL,
+        bind(&MsgConn::handle_exit_channel,             this, std::placeholders::_1));
+
+    m_dispatcher.register_message_callback((int)M2D::CHANNEL_USER_UPDATE,
+        bind(&MsgConn::handle_channel_user_update,      this, std::placeholders::_1));
 
     // connection pool init
     read_head();
@@ -374,6 +379,62 @@ void MsgConn::handle_fetch_channels(pb_message_ptr p_msg_)
 }
 
 
+void MsgConn::handle_exit_channel(pb_message_ptr p_msg_)
+{
+
+    TRY
+
+
+    auto descriptor = p_msg_->GetDescriptor();
+    const Reflection* rf = p_msg_->GetReflection();
+    const FieldDescriptor* f_req_id     = descriptor->FindFieldByName("user_id");
+    const FieldDescriptor* f_channel_id = descriptor->FindFieldByName("channel_id");
+    const FieldDescriptor* f_result     = descriptor->FindFieldByName("result");
+
+    assert(f_req_id     && f_req_id->type()     == FieldDescriptor::TYPE_INT64);
+    assert(f_channel_id && f_channel_id->type() == FieldDescriptor::TYPE_INT32);
+    assert(f_result     && f_result->type()     == FieldDescriptor::TYPE_INT32);
+
+
+
+    int64_t  user_id    = rf->GetInt64(*p_msg_, f_req_id);
+    int32_t  channel_id = rf->GetInt32(*p_msg_, f_channel_id);
+
+
+    db_connect_ptr conn_ = ConnPool::get_instance()->get_free_conn();
+    vector<string> vResult;
+    vector<string> vPassData;
+    vPassData.push_back(to_string(user_id));
+    vPassData.push_back(to_string(channel_id));
+
+
+    m_sql_handler.exit_channel(conn_, vPassData, vResult);
+
+    if (vResult.empty())
+    {
+        cout << "handler_exit_channel Error!" << endl;
+    }
+    else
+    {
+
+        int result = stoi(vResult[0]);
+
+        rf->SetInt32(&(*p_msg_), f_result, (int32_t)result);
+
+        CMsg packet;
+        packet.encode((int)M2D::EXIT_CHANNEL, *p_msg_);
+        send(packet);
+    }
+
+
+    /// release conn
+    ConnPool::get_instance()->release_conn(conn_);
+
+    CATCH
+
+}
+
+
 
 void MsgConn::handle_join_channel(pb_message_ptr p_msg_)
 {
@@ -411,7 +472,9 @@ void MsgConn::handle_join_channel(pb_message_ptr p_msg_)
     }
     else
     {
+
         int result = stoi(vResult[0]);
+        //cout << "join result: " << result << endl;
         rf->SetInt32(&(*p_msg_), f_result, (int32_t)result);
 
         CMsg packet;
@@ -425,6 +488,50 @@ void MsgConn::handle_join_channel(pb_message_ptr p_msg_)
 
     CATCH
 
+}
+
+
+void MsgConn::handle_channel_user_update(pb_message_ptr p_msg_)
+{
+    TRY
+
+    auto descriptor = p_msg_->GetDescriptor();
+    const Reflection* rf = p_msg_->GetReflection();
+    const FieldDescriptor* f_req_id     = descriptor->FindFieldByName("user_id");
+    const FieldDescriptor* f_channel_id = descriptor->FindFieldByName("channel_id");
+
+    assert(f_req_id     && f_req_id->type()     == FieldDescriptor::TYPE_INT64);
+    assert(f_channel_id && f_channel_id->type() == FieldDescriptor::TYPE_INT32);
+
+    db_connect_ptr conn_ = ConnPool::get_instance()->get_free_conn();
+
+
+    int64_t user_id     = rf->GetInt64(*p_msg_, f_req_id);
+    int32_t channel_id  = rf->GetInt32(*p_msg_, f_channel_id);
+
+
+    vector<string> vResult;
+    m_sql_handler.read_info(conn_, user_id, vResult);
+
+
+    IM::UserUpdateAck update_ack;
+    update_ack.set_channel_id(channel_id);
+
+    IM::User *pUser = update_ack.mutable_user();
+    pUser->set_id(user_id);
+    pUser->set_name(vResult[0]);
+    pUser->set_nick_name(vResult[1]);
+    pUser->set_sex(vResult[2]);
+
+
+    CMsg packet;
+    packet.encode((int)M2D::CHANNEL_USER_UPDATE, update_ack);
+    send(packet);
+
+
+    /// release conn
+    ConnPool::get_instance()->release_conn(conn_);
+    CATCH
 }
 
 

@@ -32,6 +32,11 @@ public:
     bool read_channels(db_connect_ptr, vector<string>&);
     // 加入频道
     bool join_channel(db_connect_ptr, vector<string>&, vector<string>&);
+    // 离开频道
+    bool exit_channel(db_connect_ptr, vector<string>&, vector<string>&);
+
+
+
 
 private:
 };

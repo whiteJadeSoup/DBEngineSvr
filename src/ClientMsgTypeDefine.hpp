@@ -92,6 +92,14 @@ enum class M2D
       * 请求加入频道
       */
      JOIN_CHANNEL                           = 5011,
+     /*
+      * 请求频道里玩家信息
+      */
+     CHANNEL_USER_UPDATE                    = 5012,
+     /*
+      * 请求离开频道
+      */
+     EXIT_CHANNEL                           = 5013,
 };
 
 

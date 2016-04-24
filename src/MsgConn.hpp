@@ -37,6 +37,11 @@ private:
     void handle_fetch_channels(pb_message_ptr);
     // 加入频道
     void handle_join_channel(pb_message_ptr);
+    // 离开频道
+    void handle_exit_channel(pb_message_ptr);
+    // 读取用户信息
+    void handle_channel_user_update(pb_message_ptr);
+
 
 private:
     SQLhandler m_sql_handler;

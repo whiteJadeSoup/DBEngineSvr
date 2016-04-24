@@ -430,9 +430,9 @@ bool SQLhandler::join_channel(db_connect_ptr conn_, vector<string>& vPassData, v
         prep_insert_stmt->setInt(1, channel_id);
         prep_insert_stmt->setInt(2, user_id);
 
-        bool result = prep_insert_stmt->execute();
+        int update_count = prep_insert_stmt->executeUpdate();
 
-        vResult.push_back( result ? "1" : "0" );
+        vResult.push_back( update_count ? "1" : "0" );
 
     }
     catch (exception& e)
@@ -443,6 +443,49 @@ bool SQLhandler::join_channel(db_connect_ptr conn_, vector<string>& vPassData, v
     }
 
 }
+
+
+bool SQLhandler::exit_channel(db_connect_ptr conn_, vector<string>& vPassData, vector<string>& vResult)
+{
+    try
+    {
+        if (!conn_->isValid())
+        {
+            cout << "conn is invalid!" << endl;
+            return false;
+        }
+
+        // 数据库
+        conn_->setSchema("account");
+
+
+        sql::PreparedStatement* prep_dele_stmt = conn_->prepareStatement(
+          "delete from t_channel_member where i_channel_id=? and i_user_id=?");
+
+
+        int64_t user_id         = (int64_t)stoi(vPassData[0]);
+        int32_t channel_id      = (int32_t)stoi(vPassData[1]);
+
+
+        prep_dele_stmt->setInt(1, channel_id);
+        prep_dele_stmt->setInt(2, user_id);
+
+        int update_count = prep_dele_stmt->executeUpdate();
+
+        vResult.push_back( update_count ? "1" : "0" );
+
+    }
+    catch (exception& e)
+    {
+        cout << "# ERR: exception in " << __FILE__;
+        cout << "(" << __FUNCTION__ << ") on line " << __LINE__ << endl;
+        cout << "# ERR: " << e.what() << endl;
+    }
+
+}
+
+
+
 
 
 
