@@ -23,7 +23,8 @@ public:
 private:
     // 存储离线消息
     void handle_offline_message(pb_message_ptr);
-
+    // 存储频道离线消息
+    void handle_add_channel_offline_msg(pb_message_ptr);
 
 private:
     MessageDispatcher m_dispatcher;

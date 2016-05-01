@@ -38,8 +38,9 @@ void protobuf_AssignDesc_user_5fupdate_2eproto() {
       "user_update.proto");
   GOOGLE_CHECK(file != NULL);
   UserUpdateReq_descriptor_ = file->message_type(0);
-  static const int UserUpdateReq_offsets_[2] = {
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UserUpdateReq, user_id_),
+  static const int UserUpdateReq_offsets_[3] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UserUpdateReq, req_id_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UserUpdateReq, target_id_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UserUpdateReq, channel_id_),
   };
   UserUpdateReq_reflection_ =
@@ -54,9 +55,10 @@ void protobuf_AssignDesc_user_5fupdate_2eproto() {
       GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UserUpdateReq, _internal_metadata_),
       GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UserUpdateReq, _is_default_instance_));
   UserUpdateAck_descriptor_ = file->message_type(1);
-  static const int UserUpdateAck_offsets_[2] = {
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UserUpdateAck, channel_id_),
+  static const int UserUpdateAck_offsets_[3] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UserUpdateAck, req_id_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UserUpdateAck, user_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UserUpdateAck, channel_id_),
   };
   UserUpdateAck_reflection_ =
     ::google::protobuf::internal::GeneratedMessageReflection::NewGeneratedMessageReflection(
@@ -105,10 +107,10 @@ void protobuf_AddDesc_user_5fupdate_2eproto() {
   ::IM::protobuf_AddDesc_contacts_2eproto();
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
     "\n\021user_update.proto\022\002IM\032\016contacts.proto\""
-    "4\n\rUserUpdateReq\022\017\n\007user_id\030\001 \001(\003\022\022\n\ncha"
-    "nnel_id\030\002 \001(\005\";\n\rUserUpdateAck\022\022\n\nchanne"
-    "l_id\030\001 \001(\005\022\026\n\004user\030\002 \001(\0132\010.IM.Userb\006prot"
-    "o3", 162);
+    "F\n\rUserUpdateReq\022\016\n\006req_id\030\001 \001(\003\022\021\n\ttarg"
+    "et_id\030\002 \001(\003\022\022\n\nchannel_id\030\003 \001(\005\"K\n\rUserU"
+    "pdateAck\022\016\n\006req_id\030\001 \001(\003\022\026\n\004user\030\002 \001(\0132\010"
+    ".IM.User\022\022\n\nchannel_id\030\003 \001(\005b\006proto3", 196);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "user_update.proto", &protobuf_RegisterTypes);
   UserUpdateReq::default_instance_ = new UserUpdateReq();
@@ -138,7 +140,8 @@ static void MergeFromFail(int line) {
 // ===================================================================
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int UserUpdateReq::kUserIdFieldNumber;
+const int UserUpdateReq::kReqIdFieldNumber;
+const int UserUpdateReq::kTargetIdFieldNumber;
 const int UserUpdateReq::kChannelIdFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
@@ -163,7 +166,8 @@ UserUpdateReq::UserUpdateReq(const UserUpdateReq& from)
 void UserUpdateReq::SharedCtor() {
     _is_default_instance_ = false;
   _cached_size_ = 0;
-  user_id_ = GOOGLE_LONGLONG(0);
+  req_id_ = GOOGLE_LONGLONG(0);
+  target_id_ = GOOGLE_LONGLONG(0);
   channel_id_ = 0;
 }
 
@@ -211,7 +215,7 @@ void UserUpdateReq::Clear() {
            ZR_HELPER_(last) - ZR_HELPER_(first) + sizeof(last));\
 } while (0)
 
-  ZR_(user_id_, channel_id_);
+  ZR_(req_id_, channel_id_);
 
 #undef ZR_HELPER_
 #undef ZR_
@@ -228,23 +232,38 @@ bool UserUpdateReq::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // optional int64 user_id = 1;
+      // optional int64 req_id = 1;
       case 1: {
         if (tag == 8) {
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
-                 input, &user_id_)));
+                 input, &req_id_)));
 
         } else {
           goto handle_unusual;
         }
-        if (input->ExpectTag(16)) goto parse_channel_id;
+        if (input->ExpectTag(16)) goto parse_target_id;
         break;
       }
 
-      // optional int32 channel_id = 2;
+      // optional int64 target_id = 2;
       case 2: {
         if (tag == 16) {
+         parse_target_id:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
+                 input, &target_id_)));
+
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(24)) goto parse_channel_id;
+        break;
+      }
+
+      // optional int32 channel_id = 3;
+      case 3: {
+        if (tag == 24) {
          parse_channel_id:
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
@@ -281,14 +300,19 @@ failure:
 void UserUpdateReq::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
   // @@protoc_insertion_point(serialize_start:IM.UserUpdateReq)
-  // optional int64 user_id = 1;
-  if (this->user_id() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt64(1, this->user_id(), output);
+  // optional int64 req_id = 1;
+  if (this->req_id() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt64(1, this->req_id(), output);
   }
 
-  // optional int32 channel_id = 2;
+  // optional int64 target_id = 2;
+  if (this->target_id() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt64(2, this->target_id(), output);
+  }
+
+  // optional int32 channel_id = 3;
   if (this->channel_id() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->channel_id(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(3, this->channel_id(), output);
   }
 
   // @@protoc_insertion_point(serialize_end:IM.UserUpdateReq)
@@ -297,14 +321,19 @@ void UserUpdateReq::SerializeWithCachedSizes(
 ::google::protobuf::uint8* UserUpdateReq::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
   // @@protoc_insertion_point(serialize_to_array_start:IM.UserUpdateReq)
-  // optional int64 user_id = 1;
-  if (this->user_id() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(1, this->user_id(), target);
+  // optional int64 req_id = 1;
+  if (this->req_id() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(1, this->req_id(), target);
   }
 
-  // optional int32 channel_id = 2;
+  // optional int64 target_id = 2;
+  if (this->target_id() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(2, this->target_id(), target);
+  }
+
+  // optional int32 channel_id = 3;
   if (this->channel_id() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->channel_id(), target);
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(3, this->channel_id(), target);
   }
 
   // @@protoc_insertion_point(serialize_to_array_end:IM.UserUpdateReq)
@@ -314,14 +343,21 @@ void UserUpdateReq::SerializeWithCachedSizes(
 int UserUpdateReq::ByteSize() const {
   int total_size = 0;
 
-  // optional int64 user_id = 1;
-  if (this->user_id() != 0) {
+  // optional int64 req_id = 1;
+  if (this->req_id() != 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::Int64Size(
-        this->user_id());
+        this->req_id());
   }
 
-  // optional int32 channel_id = 2;
+  // optional int64 target_id = 2;
+  if (this->target_id() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::Int64Size(
+        this->target_id());
+  }
+
+  // optional int32 channel_id = 3;
   if (this->channel_id() != 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::Int32Size(
@@ -348,8 +384,11 @@ void UserUpdateReq::MergeFrom(const ::google::protobuf::Message& from) {
 
 void UserUpdateReq::MergeFrom(const UserUpdateReq& from) {
   if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
-  if (from.user_id() != 0) {
-    set_user_id(from.user_id());
+  if (from.req_id() != 0) {
+    set_req_id(from.req_id());
+  }
+  if (from.target_id() != 0) {
+    set_target_id(from.target_id());
   }
   if (from.channel_id() != 0) {
     set_channel_id(from.channel_id());
@@ -378,7 +417,8 @@ void UserUpdateReq::Swap(UserUpdateReq* other) {
   InternalSwap(other);
 }
 void UserUpdateReq::InternalSwap(UserUpdateReq* other) {
-  std::swap(user_id_, other->user_id_);
+  std::swap(req_id_, other->req_id_);
+  std::swap(target_id_, other->target_id_);
   std::swap(channel_id_, other->channel_id_);
   _internal_metadata_.Swap(&other->_internal_metadata_);
   std::swap(_cached_size_, other->_cached_size_);
@@ -395,21 +435,35 @@ void UserUpdateReq::InternalSwap(UserUpdateReq* other) {
 #if PROTOBUF_INLINE_NOT_IN_HEADERS
 // UserUpdateReq
 
-// optional int64 user_id = 1;
-void UserUpdateReq::clear_user_id() {
-  user_id_ = GOOGLE_LONGLONG(0);
+// optional int64 req_id = 1;
+void UserUpdateReq::clear_req_id() {
+  req_id_ = GOOGLE_LONGLONG(0);
 }
- ::google::protobuf::int64 UserUpdateReq::user_id() const {
-  // @@protoc_insertion_point(field_get:IM.UserUpdateReq.user_id)
-  return user_id_;
+ ::google::protobuf::int64 UserUpdateReq::req_id() const {
+  // @@protoc_insertion_point(field_get:IM.UserUpdateReq.req_id)
+  return req_id_;
 }
- void UserUpdateReq::set_user_id(::google::protobuf::int64 value) {
+ void UserUpdateReq::set_req_id(::google::protobuf::int64 value) {
   
-  user_id_ = value;
-  // @@protoc_insertion_point(field_set:IM.UserUpdateReq.user_id)
+  req_id_ = value;
+  // @@protoc_insertion_point(field_set:IM.UserUpdateReq.req_id)
 }
 
-// optional int32 channel_id = 2;
+// optional int64 target_id = 2;
+void UserUpdateReq::clear_target_id() {
+  target_id_ = GOOGLE_LONGLONG(0);
+}
+ ::google::protobuf::int64 UserUpdateReq::target_id() const {
+  // @@protoc_insertion_point(field_get:IM.UserUpdateReq.target_id)
+  return target_id_;
+}
+ void UserUpdateReq::set_target_id(::google::protobuf::int64 value) {
+  
+  target_id_ = value;
+  // @@protoc_insertion_point(field_set:IM.UserUpdateReq.target_id)
+}
+
+// optional int32 channel_id = 3;
 void UserUpdateReq::clear_channel_id() {
   channel_id_ = 0;
 }
@@ -428,8 +482,9 @@ void UserUpdateReq::clear_channel_id() {
 // ===================================================================
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int UserUpdateAck::kChannelIdFieldNumber;
+const int UserUpdateAck::kReqIdFieldNumber;
 const int UserUpdateAck::kUserFieldNumber;
+const int UserUpdateAck::kChannelIdFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 UserUpdateAck::UserUpdateAck()
@@ -454,8 +509,9 @@ UserUpdateAck::UserUpdateAck(const UserUpdateAck& from)
 void UserUpdateAck::SharedCtor() {
     _is_default_instance_ = false;
   _cached_size_ = 0;
-  channel_id_ = 0;
+  req_id_ = GOOGLE_LONGLONG(0);
   user_ = NULL;
+  channel_id_ = 0;
 }
 
 UserUpdateAck::~UserUpdateAck() {
@@ -495,9 +551,10 @@ UserUpdateAck* UserUpdateAck::New(::google::protobuf::Arena* arena) const {
 }
 
 void UserUpdateAck::Clear() {
-  channel_id_ = 0;
+  req_id_ = GOOGLE_LONGLONG(0);
   if (GetArenaNoVirtual() == NULL && user_ != NULL) delete user_;
   user_ = NULL;
+  channel_id_ = 0;
 }
 
 bool UserUpdateAck::MergePartialFromCodedStream(
@@ -510,12 +567,12 @@ bool UserUpdateAck::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // optional int32 channel_id = 1;
+      // optional int64 req_id = 1;
       case 1: {
         if (tag == 8) {
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
-                 input, &channel_id_)));
+                   ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
+                 input, &req_id_)));
 
         } else {
           goto handle_unusual;
@@ -530,6 +587,21 @@ bool UserUpdateAck::MergePartialFromCodedStream(
          parse_user:
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
                input, mutable_user()));
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(24)) goto parse_channel_id;
+        break;
+      }
+
+      // optional int32 channel_id = 3;
+      case 3: {
+        if (tag == 24) {
+         parse_channel_id:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &channel_id_)));
+
         } else {
           goto handle_unusual;
         }
@@ -561,9 +633,9 @@ failure:
 void UserUpdateAck::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
   // @@protoc_insertion_point(serialize_start:IM.UserUpdateAck)
-  // optional int32 channel_id = 1;
-  if (this->channel_id() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->channel_id(), output);
+  // optional int64 req_id = 1;
+  if (this->req_id() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt64(1, this->req_id(), output);
   }
 
   // optional .IM.User user = 2;
@@ -572,15 +644,20 @@ void UserUpdateAck::SerializeWithCachedSizes(
       2, *this->user_, output);
   }
 
+  // optional int32 channel_id = 3;
+  if (this->channel_id() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(3, this->channel_id(), output);
+  }
+
   // @@protoc_insertion_point(serialize_end:IM.UserUpdateAck)
 }
 
 ::google::protobuf::uint8* UserUpdateAck::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
   // @@protoc_insertion_point(serialize_to_array_start:IM.UserUpdateAck)
-  // optional int32 channel_id = 1;
-  if (this->channel_id() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(1, this->channel_id(), target);
+  // optional int64 req_id = 1;
+  if (this->req_id() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(1, this->req_id(), target);
   }
 
   // optional .IM.User user = 2;
@@ -590,6 +667,11 @@ void UserUpdateAck::SerializeWithCachedSizes(
         2, *this->user_, target);
   }
 
+  // optional int32 channel_id = 3;
+  if (this->channel_id() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(3, this->channel_id(), target);
+  }
+
   // @@protoc_insertion_point(serialize_to_array_end:IM.UserUpdateAck)
   return target;
 }
@@ -597,11 +679,11 @@ void UserUpdateAck::SerializeWithCachedSizes(
 int UserUpdateAck::ByteSize() const {
   int total_size = 0;
 
-  // optional int32 channel_id = 1;
-  if (this->channel_id() != 0) {
+  // optional int64 req_id = 1;
+  if (this->req_id() != 0) {
     total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::Int32Size(
-        this->channel_id());
+      ::google::protobuf::internal::WireFormatLite::Int64Size(
+        this->req_id());
   }
 
   // optional .IM.User user = 2;
@@ -609,6 +691,13 @@ int UserUpdateAck::ByteSize() const {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
         *this->user_);
+  }
+
+  // optional int32 channel_id = 3;
+  if (this->channel_id() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::Int32Size(
+        this->channel_id());
   }
 
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
@@ -631,11 +720,14 @@ void UserUpdateAck::MergeFrom(const ::google::protobuf::Message& from) {
 
 void UserUpdateAck::MergeFrom(const UserUpdateAck& from) {
   if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
-  if (from.channel_id() != 0) {
-    set_channel_id(from.channel_id());
+  if (from.req_id() != 0) {
+    set_req_id(from.req_id());
   }
   if (from.has_user()) {
     mutable_user()->::IM::User::MergeFrom(from.user());
+  }
+  if (from.channel_id() != 0) {
+    set_channel_id(from.channel_id());
   }
 }
 
@@ -661,8 +753,9 @@ void UserUpdateAck::Swap(UserUpdateAck* other) {
   InternalSwap(other);
 }
 void UserUpdateAck::InternalSwap(UserUpdateAck* other) {
-  std::swap(channel_id_, other->channel_id_);
+  std::swap(req_id_, other->req_id_);
   std::swap(user_, other->user_);
+  std::swap(channel_id_, other->channel_id_);
   _internal_metadata_.Swap(&other->_internal_metadata_);
   std::swap(_cached_size_, other->_cached_size_);
 }
@@ -678,18 +771,18 @@ void UserUpdateAck::InternalSwap(UserUpdateAck* other) {
 #if PROTOBUF_INLINE_NOT_IN_HEADERS
 // UserUpdateAck
 
-// optional int32 channel_id = 1;
-void UserUpdateAck::clear_channel_id() {
-  channel_id_ = 0;
+// optional int64 req_id = 1;
+void UserUpdateAck::clear_req_id() {
+  req_id_ = GOOGLE_LONGLONG(0);
 }
- ::google::protobuf::int32 UserUpdateAck::channel_id() const {
-  // @@protoc_insertion_point(field_get:IM.UserUpdateAck.channel_id)
-  return channel_id_;
+ ::google::protobuf::int64 UserUpdateAck::req_id() const {
+  // @@protoc_insertion_point(field_get:IM.UserUpdateAck.req_id)
+  return req_id_;
 }
- void UserUpdateAck::set_channel_id(::google::protobuf::int32 value) {
+ void UserUpdateAck::set_req_id(::google::protobuf::int64 value) {
   
-  channel_id_ = value;
-  // @@protoc_insertion_point(field_set:IM.UserUpdateAck.channel_id)
+  req_id_ = value;
+  // @@protoc_insertion_point(field_set:IM.UserUpdateAck.req_id)
 }
 
 // optional .IM.User user = 2;
@@ -727,6 +820,20 @@ void UserUpdateAck::set_allocated_user(::IM::User* user) {
     
   }
   // @@protoc_insertion_point(field_set_allocated:IM.UserUpdateAck.user)
+}
+
+// optional int32 channel_id = 3;
+void UserUpdateAck::clear_channel_id() {
+  channel_id_ = 0;
+}
+ ::google::protobuf::int32 UserUpdateAck::channel_id() const {
+  // @@protoc_insertion_point(field_get:IM.UserUpdateAck.channel_id)
+  return channel_id_;
+}
+ void UserUpdateAck::set_channel_id(::google::protobuf::int32 value) {
+  
+  channel_id_ = value;
+  // @@protoc_insertion_point(field_set:IM.UserUpdateAck.channel_id)
 }
 
 #endif  // PROTOBUF_INLINE_NOT_IN_HEADERS

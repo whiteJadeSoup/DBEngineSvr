@@ -35,9 +35,8 @@ void protobuf_AssignDesc_operate_5fchannel_2eproto() {
       "operate_channel.proto");
   GOOGLE_CHECK(file != NULL);
   OperateChannel_descriptor_ = file->message_type(0);
-  static const int OperateChannel_offsets_[3] = {
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OperateChannel, user_id_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OperateChannel, channel_id_),
+  static const int OperateChannel_offsets_[2] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OperateChannel, req_base_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OperateChannel, result_),
   };
   OperateChannel_reflection_ =
@@ -80,10 +79,12 @@ void protobuf_AddDesc_operate_5fchannel_2eproto() {
   already_here = true;
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
+  ::IM::protobuf_AddDesc_operate_5freq_5fbase_2eproto();
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-    "\n\025operate_channel.proto\022\002IM\"E\n\016OperateCh"
-    "annel\022\017\n\007user_id\030\001 \001(\003\022\022\n\nchannel_id\030\002 \001"
-    "(\005\022\016\n\006result\030\003 \001(\005b\006proto3", 106);
+    "\n\025operate_channel.proto\022\002IM\032\026operate_req"
+    "_base.proto\"F\n\016OperateChannel\022$\n\010req_bas"
+    "e\030\001 \001(\0132\022.IM.OperateReqBase\022\016\n\006result\030\002 "
+    "\001(\005b\006proto3", 131);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "operate_channel.proto", &protobuf_RegisterTypes);
   OperateChannel::default_instance_ = new OperateChannel();
@@ -111,8 +112,7 @@ static void MergeFromFail(int line) {
 // ===================================================================
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int OperateChannel::kUserIdFieldNumber;
-const int OperateChannel::kChannelIdFieldNumber;
+const int OperateChannel::kReqBaseFieldNumber;
 const int OperateChannel::kResultFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
@@ -124,6 +124,7 @@ OperateChannel::OperateChannel()
 
 void OperateChannel::InitAsDefaultInstance() {
   _is_default_instance_ = true;
+  req_base_ = const_cast< ::IM::OperateReqBase*>(&::IM::OperateReqBase::default_instance());
 }
 
 OperateChannel::OperateChannel(const OperateChannel& from)
@@ -137,8 +138,7 @@ OperateChannel::OperateChannel(const OperateChannel& from)
 void OperateChannel::SharedCtor() {
     _is_default_instance_ = false;
   _cached_size_ = 0;
-  user_id_ = GOOGLE_LONGLONG(0);
-  channel_id_ = 0;
+  req_base_ = NULL;
   result_ = 0;
 }
 
@@ -149,6 +149,7 @@ OperateChannel::~OperateChannel() {
 
 void OperateChannel::SharedDtor() {
   if (this != default_instance_) {
+    delete req_base_;
   }
 }
 
@@ -178,19 +179,9 @@ OperateChannel* OperateChannel::New(::google::protobuf::Arena* arena) const {
 }
 
 void OperateChannel::Clear() {
-#define ZR_HELPER_(f) reinterpret_cast<char*>(\
-  &reinterpret_cast<OperateChannel*>(16)->f)
-
-#define ZR_(first, last) do {\
-  ::memset(&first, 0,\
-           ZR_HELPER_(last) - ZR_HELPER_(first) + sizeof(last));\
-} while (0)
-
-  ZR_(user_id_, result_);
-
-#undef ZR_HELPER_
-#undef ZR_
-
+  if (GetArenaNoVirtual() == NULL && req_base_ != NULL) delete req_base_;
+  req_base_ = NULL;
+  result_ = 0;
 }
 
 bool OperateChannel::MergePartialFromCodedStream(
@@ -203,38 +194,21 @@ bool OperateChannel::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // optional int64 user_id = 1;
+      // optional .IM.OperateReqBase req_base = 1;
       case 1: {
-        if (tag == 8) {
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
-                 input, &user_id_)));
-
+        if (tag == 10) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+               input, mutable_req_base()));
         } else {
           goto handle_unusual;
         }
-        if (input->ExpectTag(16)) goto parse_channel_id;
+        if (input->ExpectTag(16)) goto parse_result;
         break;
       }
 
-      // optional int32 channel_id = 2;
+      // optional int32 result = 2;
       case 2: {
         if (tag == 16) {
-         parse_channel_id:
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
-                 input, &channel_id_)));
-
-        } else {
-          goto handle_unusual;
-        }
-        if (input->ExpectTag(24)) goto parse_result;
-        break;
-      }
-
-      // optional int32 result = 3;
-      case 3: {
-        if (tag == 24) {
          parse_result:
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
@@ -271,19 +245,15 @@ failure:
 void OperateChannel::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
   // @@protoc_insertion_point(serialize_start:IM.OperateChannel)
-  // optional int64 user_id = 1;
-  if (this->user_id() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt64(1, this->user_id(), output);
+  // optional .IM.OperateReqBase req_base = 1;
+  if (this->has_req_base()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      1, *this->req_base_, output);
   }
 
-  // optional int32 channel_id = 2;
-  if (this->channel_id() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->channel_id(), output);
-  }
-
-  // optional int32 result = 3;
+  // optional int32 result = 2;
   if (this->result() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(3, this->result(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->result(), output);
   }
 
   // @@protoc_insertion_point(serialize_end:IM.OperateChannel)
@@ -292,19 +262,16 @@ void OperateChannel::SerializeWithCachedSizes(
 ::google::protobuf::uint8* OperateChannel::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
   // @@protoc_insertion_point(serialize_to_array_start:IM.OperateChannel)
-  // optional int64 user_id = 1;
-  if (this->user_id() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(1, this->user_id(), target);
+  // optional .IM.OperateReqBase req_base = 1;
+  if (this->has_req_base()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        1, *this->req_base_, target);
   }
 
-  // optional int32 channel_id = 2;
-  if (this->channel_id() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->channel_id(), target);
-  }
-
-  // optional int32 result = 3;
+  // optional int32 result = 2;
   if (this->result() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(3, this->result(), target);
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->result(), target);
   }
 
   // @@protoc_insertion_point(serialize_to_array_end:IM.OperateChannel)
@@ -314,21 +281,14 @@ void OperateChannel::SerializeWithCachedSizes(
 int OperateChannel::ByteSize() const {
   int total_size = 0;
 
-  // optional int64 user_id = 1;
-  if (this->user_id() != 0) {
+  // optional .IM.OperateReqBase req_base = 1;
+  if (this->has_req_base()) {
     total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::Int64Size(
-        this->user_id());
+      ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+        *this->req_base_);
   }
 
-  // optional int32 channel_id = 2;
-  if (this->channel_id() != 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::Int32Size(
-        this->channel_id());
-  }
-
-  // optional int32 result = 3;
+  // optional int32 result = 2;
   if (this->result() != 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::Int32Size(
@@ -355,11 +315,8 @@ void OperateChannel::MergeFrom(const ::google::protobuf::Message& from) {
 
 void OperateChannel::MergeFrom(const OperateChannel& from) {
   if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
-  if (from.user_id() != 0) {
-    set_user_id(from.user_id());
-  }
-  if (from.channel_id() != 0) {
-    set_channel_id(from.channel_id());
+  if (from.has_req_base()) {
+    mutable_req_base()->::IM::OperateReqBase::MergeFrom(from.req_base());
   }
   if (from.result() != 0) {
     set_result(from.result());
@@ -388,8 +345,7 @@ void OperateChannel::Swap(OperateChannel* other) {
   InternalSwap(other);
 }
 void OperateChannel::InternalSwap(OperateChannel* other) {
-  std::swap(user_id_, other->user_id_);
-  std::swap(channel_id_, other->channel_id_);
+  std::swap(req_base_, other->req_base_);
   std::swap(result_, other->result_);
   _internal_metadata_.Swap(&other->_internal_metadata_);
   std::swap(_cached_size_, other->_cached_size_);
@@ -406,35 +362,44 @@ void OperateChannel::InternalSwap(OperateChannel* other) {
 #if PROTOBUF_INLINE_NOT_IN_HEADERS
 // OperateChannel
 
-// optional int64 user_id = 1;
-void OperateChannel::clear_user_id() {
-  user_id_ = GOOGLE_LONGLONG(0);
+// optional .IM.OperateReqBase req_base = 1;
+bool OperateChannel::has_req_base() const {
+  return !_is_default_instance_ && req_base_ != NULL;
 }
- ::google::protobuf::int64 OperateChannel::user_id() const {
-  // @@protoc_insertion_point(field_get:IM.OperateChannel.user_id)
-  return user_id_;
+void OperateChannel::clear_req_base() {
+  if (GetArenaNoVirtual() == NULL && req_base_ != NULL) delete req_base_;
+  req_base_ = NULL;
 }
- void OperateChannel::set_user_id(::google::protobuf::int64 value) {
+const ::IM::OperateReqBase& OperateChannel::req_base() const {
+  // @@protoc_insertion_point(field_get:IM.OperateChannel.req_base)
+  return req_base_ != NULL ? *req_base_ : *default_instance_->req_base_;
+}
+::IM::OperateReqBase* OperateChannel::mutable_req_base() {
   
-  user_id_ = value;
-  // @@protoc_insertion_point(field_set:IM.OperateChannel.user_id)
+  if (req_base_ == NULL) {
+    req_base_ = new ::IM::OperateReqBase;
+  }
+  // @@protoc_insertion_point(field_mutable:IM.OperateChannel.req_base)
+  return req_base_;
+}
+::IM::OperateReqBase* OperateChannel::release_req_base() {
+  
+  ::IM::OperateReqBase* temp = req_base_;
+  req_base_ = NULL;
+  return temp;
+}
+void OperateChannel::set_allocated_req_base(::IM::OperateReqBase* req_base) {
+  delete req_base_;
+  req_base_ = req_base;
+  if (req_base) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_set_allocated:IM.OperateChannel.req_base)
 }
 
-// optional int32 channel_id = 2;
-void OperateChannel::clear_channel_id() {
-  channel_id_ = 0;
-}
- ::google::protobuf::int32 OperateChannel::channel_id() const {
-  // @@protoc_insertion_point(field_get:IM.OperateChannel.channel_id)
-  return channel_id_;
-}
- void OperateChannel::set_channel_id(::google::protobuf::int32 value) {
-  
-  channel_id_ = value;
-  // @@protoc_insertion_point(field_set:IM.OperateChannel.channel_id)
-}
-
-// optional int32 result = 3;
+// optional int32 result = 2;
 void OperateChannel::clear_result() {
   result_ = 0;
 }

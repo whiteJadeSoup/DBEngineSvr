@@ -1,0 +1,9 @@
+syntax="proto3";
+package IM;
+
+
+message OperateReqBase
+{
+    int64 user_id		= 1;		// ”√ªßid
+    int32 channel_id		= 2;		// ∆µµ¿id
+}

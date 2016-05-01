@@ -82,6 +82,13 @@ enum class M2D
       */
      SAVE_TO_HISTORY                        = 5003,
 
+     /*
+      *  保存频道聊天历史信息
+      */
+     SAVE_CHANNEL_HISTORY                   = 5004,
+
+     FETCH_CHANNEL_OFFLINE_MESSAGE          = 5005,
+
 
      /*
       * 读取频道信息
@@ -116,6 +123,12 @@ enum class R2D
      */
 
     ADD_OFFLINE_MESSAGE     = 4000,
+
+    /*
+     *  添加一条或者多条频道离线消息
+     */
+    ADD_OFFLINE_CHANNEL_MSG = 4001,
+
 };
 
 

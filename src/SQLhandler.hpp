@@ -24,10 +24,16 @@ public:
     bool read_contacts(db_connect_ptr, int64_t, vector<string>&);
     // 保存离线消息
     bool save_offline_message(db_connect_ptr, vector<string>&);
+    // 保存频道离线消息
+    bool save_channel_offline_message(db_connect_ptr, vector<string>&);
     // 读取离线消息
     bool read_offline_message(db_connect_ptr, int64_t, vector<string>&);
+    // 读取频道离线消息
+    bool read_channel_offline_message(db_connect_ptr, int64_t, vector<string>&);
     // 将离线消息改为历史消息
     bool save_to_history(db_connect_ptr conn_, int64_t, vector<string>&);
+    // 保存历史消息
+    bool save_channel_history(db_connect_ptr, vector<string>&);
     // 读取频道信息
     bool read_channels(db_connect_ptr, vector<string>&);
     // 加入频道
@@ -39,6 +45,7 @@ public:
 
 
 private:
+    string GetString(istream*);
 };
 
 

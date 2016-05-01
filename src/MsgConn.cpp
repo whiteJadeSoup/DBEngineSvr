@@ -38,8 +38,14 @@ void MsgConn::on_connect()
     m_dispatcher.register_message_callback((int)M2D::FETCH_OFFLINE_MESSAGE,
         bind(&MsgConn::handle_fetch_offline_message,    this, std::placeholders::_1));
 
+    m_dispatcher.register_message_callback((int)M2D::FETCH_CHANNEL_OFFLINE_MESSAGE,
+        bind(&MsgConn::handle_fetch_channel_offline_msg,    this, std::placeholders::_1));
+
     m_dispatcher.register_message_callback((int)M2D::SAVE_TO_HISTORY,
         bind(&MsgConn::handle_save_history,             this, std::placeholders::_1));
+
+    m_dispatcher.register_message_callback((int)M2D::SAVE_CHANNEL_HISTORY,
+        bind(&MsgConn::handle_save_channel_history,     this, std::placeholders::_1));
 
     m_dispatcher.register_message_callback((int)M2D::FETCH_CHANNELS,
         bind(&MsgConn::handle_fetch_channels,           this, std::placeholders::_1));
@@ -193,6 +199,59 @@ void MsgConn::handle_fetch_contacts(pb_message_ptr p_msg_)
 }
 
 
+void MsgConn::handle_fetch_channel_offline_msg(pb_message_ptr p_msg_)
+{
+
+
+    TRY
+        auto descriptor = p_msg_->GetDescriptor();
+        const Reflection* rf = p_msg_->GetReflection();
+        const FieldDescriptor* f_req_id = descriptor->FindFieldByName("id");
+
+
+        assert(f_req_id && f_req_id->type() == FieldDescriptor::TYPE_INT64);
+
+
+        int64_t id = rf->GetInt64(*p_msg_, f_req_id);
+
+
+
+        vector<string> result;
+        db_connect_ptr conn = ConnPool::get_instance()->get_free_conn();
+        m_sql_handler.read_channel_offline_message(conn, id, result);
+        // release conn
+        ConnPool::get_instance()->release_conn(conn);
+
+
+        IM::ChannelMsgCach MessageCach;
+        MessageCach.set_req_id(id);
+
+        if (result.size() < 4)
+        {
+            cout << "error! size < 4! req_id: " << id << endl;
+            return ;
+        }
+
+
+        for(int i = 0; i < result.size(); i += 4)
+        {
+            IM::ChannelChatPkt* pMessage = MessageCach.add_channel_messages();
+            pMessage->set_recv_id(id);
+            pMessage->set_send_id((int64_t)(stoi(result[i])));
+            pMessage->set_channel_id(stoi(result[i+1]));
+            pMessage->set_content(result[i+2]);
+            pMessage->set_send_time(result[i+3]);
+        }
+
+
+        CMsg packet;
+        packet.encode((int)M2D::FETCH_CHANNEL_OFFLINE_MESSAGE, MessageCach);
+        send(packet);
+
+    CATCH
+
+}
+
 
 void MsgConn::handle_fetch_offline_message(pb_message_ptr p_msg_)
 {
@@ -249,6 +308,51 @@ void MsgConn::handle_fetch_offline_message(pb_message_ptr p_msg_)
         cout << "(" << __FUNCTION__ << ") on line " << __LINE__ << endl;
         cout << "# ERR: " << e.what() << endl;
     }
+
+}
+
+
+void MsgConn::handle_save_channel_history(pb_message_ptr p_msg_)
+{
+    TRY
+        auto descriptor = p_msg_->GetDescriptor();
+        const Reflection* rf = p_msg_->GetReflection();
+        const FieldDescriptor* f_messages = descriptor->FindFieldByName("channel_messages");
+
+
+        assert(f_messages && f_messages->is_repeated());
+
+        vector<string> vPassData;
+        RepeatedPtrField<IM::ChannelChatPkt> chat_messages
+            = rf->GetRepeatedPtrField<IM::ChannelChatPkt>(*p_msg_, f_messages);
+
+        auto it = chat_messages.begin();
+        for(; it != chat_messages.end(); ++it)
+        {
+            int64_t send_id = it->send_id();
+            int64_t recv_id = it->recv_id();
+            int32_t ch_id   = it->channel_id();
+            string content  = it->content();
+            string send_tm  = it->send_time();
+
+            vPassData.push_back(to_string(send_id));
+            vPassData.push_back(to_string(recv_id));
+            vPassData.push_back(to_string(ch_id));
+            vPassData.push_back(move(content));
+            vPassData.push_back(move(send_tm));
+        }
+
+        db_connect_ptr conn = ConnPool::get_instance()->get_free_conn();
+        m_sql_handler.save_channel_history(conn, vPassData);
+
+
+        // release conn
+        ConnPool::get_instance()->release_conn(conn);
+
+
+
+
+    CATCH
 
 }
 
@@ -310,13 +414,7 @@ void MsgConn::handle_save_history(pb_message_ptr p_msg_)
 
 void MsgConn::handle_fetch_channels(pb_message_ptr p_msg_)
 {
-    try
-    {
-        GOOGLE_PROTOBUF_VERIFY_VERSION;
-        using namespace google::protobuf;
-
-
-
+    TRY
         vector<string> vResult;
         db_connect_ptr conn_ = ConnPool::get_instance()->get_free_conn();
         m_sql_handler.read_channels(conn_, vResult);
@@ -368,13 +466,7 @@ void MsgConn::handle_fetch_channels(pb_message_ptr p_msg_)
 
         // release conn
         ConnPool::get_instance()->release_conn(conn_);
-    }
-    catch (exception& e)
-    {
-        cout << "# ERR: exception in " << __FILE__;
-        cout << "(" << __FUNCTION__ << ") on line " << __LINE__ << endl;
-        cout << "# ERR: " << e.what() << endl;
-    }
+    CATCH
 
 }
 
@@ -384,21 +476,27 @@ void MsgConn::handle_exit_channel(pb_message_ptr p_msg_)
 
     TRY
 
-
     auto descriptor = p_msg_->GetDescriptor();
     const Reflection* rf = p_msg_->GetReflection();
-    const FieldDescriptor* f_req_id     = descriptor->FindFieldByName("user_id");
-    const FieldDescriptor* f_channel_id = descriptor->FindFieldByName("channel_id");
-    const FieldDescriptor* f_result     = descriptor->FindFieldByName("result");
+    const FieldDescriptor* f_req_base = descriptor->FindFieldByName("req_base");
+    const FieldDescriptor* f_result = descriptor->FindFieldByName("result");
 
-    assert(f_req_id     && f_req_id->type()     == FieldDescriptor::TYPE_INT64);
-    assert(f_channel_id && f_channel_id->type() == FieldDescriptor::TYPE_INT32);
-    assert(f_result     && f_result->type()     == FieldDescriptor::TYPE_INT32);
+    assert(f_req_base   && f_req_base->type()   ==FieldDescriptor::TYPE_MESSAGE);
 
 
+    google::protobuf::Message *pMessage = (rf->MutableMessage(&(*p_msg_), f_req_base));
 
-    int64_t  user_id    = rf->GetInt64(*p_msg_, f_req_id);
-    int32_t  channel_id = rf->GetInt32(*p_msg_, f_channel_id);
+    const Reflection* p_message_rf      = pMessage->GetReflection();
+    const FieldDescriptor* f_user_id    = pMessage->GetDescriptor()->FindFieldByName("user_id");
+    const FieldDescriptor* f_channel_id = pMessage->GetDescriptor()->FindFieldByName("channel_id");
+
+    assert(f_user_id        && f_user_id->type()        ==FieldDescriptor::TYPE_INT64);
+    assert(f_channel_id     && f_channel_id->type()     ==FieldDescriptor::TYPE_INT32);
+
+
+    int64_t user_id     = p_message_rf->GetInt64(*pMessage, f_user_id);
+    int32_t channel_id  = p_message_rf->GetInt32(*pMessage, f_channel_id);
+
 
 
     db_connect_ptr conn_ = ConnPool::get_instance()->get_free_conn();
@@ -440,21 +538,25 @@ void MsgConn::handle_join_channel(pb_message_ptr p_msg_)
 {
     TRY
 
-
     auto descriptor = p_msg_->GetDescriptor();
     const Reflection* rf = p_msg_->GetReflection();
-    const FieldDescriptor* f_req_id     = descriptor->FindFieldByName("user_id");
-    const FieldDescriptor* f_channel_id = descriptor->FindFieldByName("channel_id");
-    const FieldDescriptor* f_result     = descriptor->FindFieldByName("result");
+    const FieldDescriptor* f_req_base = descriptor->FindFieldByName("req_base");
+    const FieldDescriptor* f_result = descriptor->FindFieldByName("result");
 
-    assert(f_req_id     && f_req_id->type()     == FieldDescriptor::TYPE_INT64);
-    assert(f_channel_id && f_channel_id->type() == FieldDescriptor::TYPE_INT32);
-    assert(f_result     && f_result->type()     == FieldDescriptor::TYPE_INT32);
+    assert(f_req_base   && f_req_base->type()   ==FieldDescriptor::TYPE_MESSAGE);
 
 
+    google::protobuf::Message *pMessage = (rf->MutableMessage(&(*p_msg_), f_req_base));
 
-    int64_t  user_id    = rf->GetInt64(*p_msg_, f_req_id);
-    int32_t  channel_id = rf->GetInt32(*p_msg_, f_channel_id);
+    const Reflection* p_message_rf      = pMessage->GetReflection();
+    const FieldDescriptor* f_user_id    = pMessage->GetDescriptor()->FindFieldByName("user_id");
+    const FieldDescriptor* f_channel_id = pMessage->GetDescriptor()->FindFieldByName("channel_id");
+
+    assert(f_user_id        && f_user_id->type()        ==FieldDescriptor::TYPE_INT64);
+    assert(f_channel_id     && f_channel_id->type()     ==FieldDescriptor::TYPE_INT32);
+
+    int64_t user_id     = p_message_rf->GetInt64(*pMessage, f_user_id);
+    int32_t channel_id  = p_message_rf->GetInt32(*pMessage, f_channel_id);
 
 
     db_connect_ptr conn_ = ConnPool::get_instance()->get_free_conn();
@@ -497,28 +599,33 @@ void MsgConn::handle_channel_user_update(pb_message_ptr p_msg_)
 
     auto descriptor = p_msg_->GetDescriptor();
     const Reflection* rf = p_msg_->GetReflection();
-    const FieldDescriptor* f_req_id     = descriptor->FindFieldByName("user_id");
+    const FieldDescriptor* f_req_id     = descriptor->FindFieldByName("req_id");
+    const FieldDescriptor* f_target_id  = descriptor->FindFieldByName("target_id");
     const FieldDescriptor* f_channel_id = descriptor->FindFieldByName("channel_id");
 
+
     assert(f_req_id     && f_req_id->type()     == FieldDescriptor::TYPE_INT64);
+    assert(f_target_id  && f_target_id->type()  == FieldDescriptor::TYPE_INT64);
     assert(f_channel_id && f_channel_id->type() == FieldDescriptor::TYPE_INT32);
 
     db_connect_ptr conn_ = ConnPool::get_instance()->get_free_conn();
 
 
-    int64_t user_id     = rf->GetInt64(*p_msg_, f_req_id);
-    int32_t channel_id  = rf->GetInt32(*p_msg_, f_channel_id);
+    int64_t req_id          = rf->GetInt64(*p_msg_, f_req_id);
+    int64_t target_id       = rf->GetInt64(*p_msg_, f_target_id);
+    int32_t channel_id      = rf->GetInt32(*p_msg_, f_channel_id);
 
 
     vector<string> vResult;
-    m_sql_handler.read_info(conn_, user_id, vResult);
+    m_sql_handler.read_info(conn_, target_id, vResult);
 
 
     IM::UserUpdateAck update_ack;
     update_ack.set_channel_id(channel_id);
+    update_ack.set_req_id(req_id);
 
     IM::User *pUser = update_ack.mutable_user();
-    pUser->set_id(user_id);
+    pUser->set_id(target_id);
     pUser->set_name(vResult[0]);
     pUser->set_nick_name(vResult[1]);
     pUser->set_sex(vResult[2]);

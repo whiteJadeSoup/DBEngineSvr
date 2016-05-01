@@ -98,15 +98,21 @@ class UserUpdateReq : public ::google::protobuf::Message {
 
   // accessors -------------------------------------------------------
 
-  // optional int64 user_id = 1;
-  void clear_user_id();
-  static const int kUserIdFieldNumber = 1;
-  ::google::protobuf::int64 user_id() const;
-  void set_user_id(::google::protobuf::int64 value);
+  // optional int64 req_id = 1;
+  void clear_req_id();
+  static const int kReqIdFieldNumber = 1;
+  ::google::protobuf::int64 req_id() const;
+  void set_req_id(::google::protobuf::int64 value);
 
-  // optional int32 channel_id = 2;
+  // optional int64 target_id = 2;
+  void clear_target_id();
+  static const int kTargetIdFieldNumber = 2;
+  ::google::protobuf::int64 target_id() const;
+  void set_target_id(::google::protobuf::int64 value);
+
+  // optional int32 channel_id = 3;
   void clear_channel_id();
-  static const int kChannelIdFieldNumber = 2;
+  static const int kChannelIdFieldNumber = 3;
   ::google::protobuf::int32 channel_id() const;
   void set_channel_id(::google::protobuf::int32 value);
 
@@ -115,7 +121,8 @@ class UserUpdateReq : public ::google::protobuf::Message {
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   bool _is_default_instance_;
-  ::google::protobuf::int64 user_id_;
+  ::google::protobuf::int64 req_id_;
+  ::google::protobuf::int64 target_id_;
   ::google::protobuf::int32 channel_id_;
   mutable int _cached_size_;
   friend void  protobuf_AddDesc_user_5fupdate_2eproto();
@@ -183,11 +190,11 @@ class UserUpdateAck : public ::google::protobuf::Message {
 
   // accessors -------------------------------------------------------
 
-  // optional int32 channel_id = 1;
-  void clear_channel_id();
-  static const int kChannelIdFieldNumber = 1;
-  ::google::protobuf::int32 channel_id() const;
-  void set_channel_id(::google::protobuf::int32 value);
+  // optional int64 req_id = 1;
+  void clear_req_id();
+  static const int kReqIdFieldNumber = 1;
+  ::google::protobuf::int64 req_id() const;
+  void set_req_id(::google::protobuf::int64 value);
 
   // optional .IM.User user = 2;
   bool has_user() const;
@@ -198,11 +205,18 @@ class UserUpdateAck : public ::google::protobuf::Message {
   ::IM::User* release_user();
   void set_allocated_user(::IM::User* user);
 
+  // optional int32 channel_id = 3;
+  void clear_channel_id();
+  static const int kChannelIdFieldNumber = 3;
+  ::google::protobuf::int32 channel_id() const;
+  void set_channel_id(::google::protobuf::int32 value);
+
   // @@protoc_insertion_point(class_scope:IM.UserUpdateAck)
  private:
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   bool _is_default_instance_;
+  ::google::protobuf::int64 req_id_;
   ::IM::User* user_;
   ::google::protobuf::int32 channel_id_;
   mutable int _cached_size_;
@@ -221,21 +235,35 @@ class UserUpdateAck : public ::google::protobuf::Message {
 #if !PROTOBUF_INLINE_NOT_IN_HEADERS
 // UserUpdateReq
 
-// optional int64 user_id = 1;
-inline void UserUpdateReq::clear_user_id() {
-  user_id_ = GOOGLE_LONGLONG(0);
+// optional int64 req_id = 1;
+inline void UserUpdateReq::clear_req_id() {
+  req_id_ = GOOGLE_LONGLONG(0);
 }
-inline ::google::protobuf::int64 UserUpdateReq::user_id() const {
-  // @@protoc_insertion_point(field_get:IM.UserUpdateReq.user_id)
-  return user_id_;
+inline ::google::protobuf::int64 UserUpdateReq::req_id() const {
+  // @@protoc_insertion_point(field_get:IM.UserUpdateReq.req_id)
+  return req_id_;
 }
-inline void UserUpdateReq::set_user_id(::google::protobuf::int64 value) {
+inline void UserUpdateReq::set_req_id(::google::protobuf::int64 value) {
   
-  user_id_ = value;
-  // @@protoc_insertion_point(field_set:IM.UserUpdateReq.user_id)
+  req_id_ = value;
+  // @@protoc_insertion_point(field_set:IM.UserUpdateReq.req_id)
 }
 
-// optional int32 channel_id = 2;
+// optional int64 target_id = 2;
+inline void UserUpdateReq::clear_target_id() {
+  target_id_ = GOOGLE_LONGLONG(0);
+}
+inline ::google::protobuf::int64 UserUpdateReq::target_id() const {
+  // @@protoc_insertion_point(field_get:IM.UserUpdateReq.target_id)
+  return target_id_;
+}
+inline void UserUpdateReq::set_target_id(::google::protobuf::int64 value) {
+  
+  target_id_ = value;
+  // @@protoc_insertion_point(field_set:IM.UserUpdateReq.target_id)
+}
+
+// optional int32 channel_id = 3;
 inline void UserUpdateReq::clear_channel_id() {
   channel_id_ = 0;
 }
@@ -253,18 +281,18 @@ inline void UserUpdateReq::set_channel_id(::google::protobuf::int32 value) {
 
 // UserUpdateAck
 
-// optional int32 channel_id = 1;
-inline void UserUpdateAck::clear_channel_id() {
-  channel_id_ = 0;
+// optional int64 req_id = 1;
+inline void UserUpdateAck::clear_req_id() {
+  req_id_ = GOOGLE_LONGLONG(0);
 }
-inline ::google::protobuf::int32 UserUpdateAck::channel_id() const {
-  // @@protoc_insertion_point(field_get:IM.UserUpdateAck.channel_id)
-  return channel_id_;
+inline ::google::protobuf::int64 UserUpdateAck::req_id() const {
+  // @@protoc_insertion_point(field_get:IM.UserUpdateAck.req_id)
+  return req_id_;
 }
-inline void UserUpdateAck::set_channel_id(::google::protobuf::int32 value) {
+inline void UserUpdateAck::set_req_id(::google::protobuf::int64 value) {
   
-  channel_id_ = value;
-  // @@protoc_insertion_point(field_set:IM.UserUpdateAck.channel_id)
+  req_id_ = value;
+  // @@protoc_insertion_point(field_set:IM.UserUpdateAck.req_id)
 }
 
 // optional .IM.User user = 2;
@@ -302,6 +330,20 @@ inline void UserUpdateAck::set_allocated_user(::IM::User* user) {
     
   }
   // @@protoc_insertion_point(field_set_allocated:IM.UserUpdateAck.user)
+}
+
+// optional int32 channel_id = 3;
+inline void UserUpdateAck::clear_channel_id() {
+  channel_id_ = 0;
+}
+inline ::google::protobuf::int32 UserUpdateAck::channel_id() const {
+  // @@protoc_insertion_point(field_get:IM.UserUpdateAck.channel_id)
+  return channel_id_;
+}
+inline void UserUpdateAck::set_channel_id(::google::protobuf::int32 value) {
+  
+  channel_id_ = value;
+  // @@protoc_insertion_point(field_set:IM.UserUpdateAck.channel_id)
 }
 
 #endif  // !PROTOBUF_INLINE_NOT_IN_HEADERS

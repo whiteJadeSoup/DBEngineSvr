@@ -27,6 +27,7 @@
 #include <google/protobuf/repeated_field.h>
 #include <google/protobuf/extension_set.h>
 #include <google/protobuf/unknown_field_set.h>
+#include "operate_req_base.pb.h"
 // @@protoc_insertion_point(includes)
 
 namespace IM {
@@ -96,21 +97,18 @@ class OperateChannel : public ::google::protobuf::Message {
 
   // accessors -------------------------------------------------------
 
-  // optional int64 user_id = 1;
-  void clear_user_id();
-  static const int kUserIdFieldNumber = 1;
-  ::google::protobuf::int64 user_id() const;
-  void set_user_id(::google::protobuf::int64 value);
+  // optional .IM.OperateReqBase req_base = 1;
+  bool has_req_base() const;
+  void clear_req_base();
+  static const int kReqBaseFieldNumber = 1;
+  const ::IM::OperateReqBase& req_base() const;
+  ::IM::OperateReqBase* mutable_req_base();
+  ::IM::OperateReqBase* release_req_base();
+  void set_allocated_req_base(::IM::OperateReqBase* req_base);
 
-  // optional int32 channel_id = 2;
-  void clear_channel_id();
-  static const int kChannelIdFieldNumber = 2;
-  ::google::protobuf::int32 channel_id() const;
-  void set_channel_id(::google::protobuf::int32 value);
-
-  // optional int32 result = 3;
+  // optional int32 result = 2;
   void clear_result();
-  static const int kResultFieldNumber = 3;
+  static const int kResultFieldNumber = 2;
   ::google::protobuf::int32 result() const;
   void set_result(::google::protobuf::int32 value);
 
@@ -119,8 +117,7 @@ class OperateChannel : public ::google::protobuf::Message {
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   bool _is_default_instance_;
-  ::google::protobuf::int64 user_id_;
-  ::google::protobuf::int32 channel_id_;
+  ::IM::OperateReqBase* req_base_;
   ::google::protobuf::int32 result_;
   mutable int _cached_size_;
   friend void  protobuf_AddDesc_operate_5fchannel_2eproto();
@@ -138,35 +135,44 @@ class OperateChannel : public ::google::protobuf::Message {
 #if !PROTOBUF_INLINE_NOT_IN_HEADERS
 // OperateChannel
 
-// optional int64 user_id = 1;
-inline void OperateChannel::clear_user_id() {
-  user_id_ = GOOGLE_LONGLONG(0);
+// optional .IM.OperateReqBase req_base = 1;
+inline bool OperateChannel::has_req_base() const {
+  return !_is_default_instance_ && req_base_ != NULL;
 }
-inline ::google::protobuf::int64 OperateChannel::user_id() const {
-  // @@protoc_insertion_point(field_get:IM.OperateChannel.user_id)
-  return user_id_;
+inline void OperateChannel::clear_req_base() {
+  if (GetArenaNoVirtual() == NULL && req_base_ != NULL) delete req_base_;
+  req_base_ = NULL;
 }
-inline void OperateChannel::set_user_id(::google::protobuf::int64 value) {
+inline const ::IM::OperateReqBase& OperateChannel::req_base() const {
+  // @@protoc_insertion_point(field_get:IM.OperateChannel.req_base)
+  return req_base_ != NULL ? *req_base_ : *default_instance_->req_base_;
+}
+inline ::IM::OperateReqBase* OperateChannel::mutable_req_base() {
   
-  user_id_ = value;
-  // @@protoc_insertion_point(field_set:IM.OperateChannel.user_id)
+  if (req_base_ == NULL) {
+    req_base_ = new ::IM::OperateReqBase;
+  }
+  // @@protoc_insertion_point(field_mutable:IM.OperateChannel.req_base)
+  return req_base_;
+}
+inline ::IM::OperateReqBase* OperateChannel::release_req_base() {
+  
+  ::IM::OperateReqBase* temp = req_base_;
+  req_base_ = NULL;
+  return temp;
+}
+inline void OperateChannel::set_allocated_req_base(::IM::OperateReqBase* req_base) {
+  delete req_base_;
+  req_base_ = req_base;
+  if (req_base) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_set_allocated:IM.OperateChannel.req_base)
 }
 
-// optional int32 channel_id = 2;
-inline void OperateChannel::clear_channel_id() {
-  channel_id_ = 0;
-}
-inline ::google::protobuf::int32 OperateChannel::channel_id() const {
-  // @@protoc_insertion_point(field_get:IM.OperateChannel.channel_id)
-  return channel_id_;
-}
-inline void OperateChannel::set_channel_id(::google::protobuf::int32 value) {
-  
-  channel_id_ = value;
-  // @@protoc_insertion_point(field_set:IM.OperateChannel.channel_id)
-}
-
-// optional int32 result = 3;
+// optional int32 result = 2;
 inline void OperateChannel::clear_result() {
   result_ = 0;
 }

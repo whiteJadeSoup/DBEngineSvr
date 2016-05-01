@@ -2,7 +2,8 @@
 
 #include "SQLhandler.hpp"
 #include <cppconn/prepared_statement.h>
-
+#include <sstream>
+#include <iterator>
 
 bool SQLhandler::validate (db_connect_ptr conn_ptr_, int64_t id, string& passwd)
 {
@@ -174,6 +175,64 @@ bool SQLhandler::read_contacts(db_connect_ptr conn_, int64_t user_id_, vector<st
 }
 
 
+bool SQLhandler::save_channel_offline_message(db_connect_ptr conn_, vector<string>& vPassData_)
+{
+
+    try
+    {
+        if (!conn_->isValid())
+        {
+            cout << "conn is invalid!" << endl;
+            return false;
+        }
+
+        // 数据库
+        conn_->setSchema("account");
+
+        // 保存离线消息
+        sql::PreparedStatement* prep_stmt = conn_->prepareStatement(
+        "insert into t_channel_message(i_send_id,i_recv_id,i_channel_id,vch_content, d_send_time, i_flag) values(?,?,?,?,?,0)");
+
+
+        for(int i = 0;  i < vPassData_.size(); i += 5)
+        {
+            int64_t send_id     = stoi(vPassData_[i]);
+            int64_t recv_id     = stoi(vPassData_[i+1]);
+            int32_t ch_id       = stoi(vPassData_[i+2]);
+            string content      = move(vPassData_[i+3]);
+            string send_tm      = move(vPassData_[i+4]);
+
+
+            istringstream iss(content);
+
+            prep_stmt->setInt(1, send_id);
+            prep_stmt->setInt(2, recv_id);
+            prep_stmt->setInt(3, ch_id);
+            prep_stmt->setBlob(4, &iss);
+            prep_stmt->setString(5, send_tm);
+
+            prep_stmt->executeUpdate();
+
+        }
+
+        delete prep_stmt;
+
+        return true;
+
+    }
+    catch (sql::SQLException& e)
+    {
+        cout << "# ERR: SQLException in " << __FILE__;
+        cout << "(" << __FUNCTION__ << ") on line " << __LINE__ << endl;
+        cout << "# ERR: " << e.what();
+        cout << " (MySQL error code: " << e.getErrorCode();
+        cout << ", SQLState: " << e.getSQLState() << " )" << endl;
+        return false;
+    }
+
+
+}
+
 
 
 bool SQLhandler::save_offline_message(db_connect_ptr conn_, vector<string>& vPassData)
@@ -200,9 +259,12 @@ bool SQLhandler::save_offline_message(db_connect_ptr conn_, vector<string>& vPas
         sql::PreparedStatement* prep_stmt = conn_->prepareStatement(
           "insert into t_message(send_id, recv_id, content, send_time, flag) values(?,?,?,?,0)");
 
+
+        istringstream iss(content);
+
         prep_stmt->setInt(1, send_id);
         prep_stmt->setInt(2, recv_id);
-        prep_stmt->setString(3, content);
+        prep_stmt->setBlob(3, &iss);
         prep_stmt->setString(4, send_tm);
 
         prep_stmt->execute();
@@ -222,6 +284,53 @@ bool SQLhandler::save_offline_message(db_connect_ptr conn_, vector<string>& vPas
         cout << ", SQLState: " << e.getSQLState() << " )" << endl;
         return false;
     }
+}
+
+
+bool SQLhandler::read_channel_offline_message(db_connect_ptr conn_, int64_t req_id, vector<string>& vResult)
+{
+    try
+    {
+        if (!conn_->isValid())
+        {
+            cout << "conn is invalid!" << endl;
+            return false;
+        }
+
+        // 数据库
+        conn_->setSchema("account");
+
+        // 获得离线消息
+        sql::PreparedStatement* prep_stmt = conn_->prepareStatement(
+          "select i_send_id, i_channel_id, vch_content, d_send_time from t_channel_message where i_recv_id = ? and i_flag = 0");
+
+        prep_stmt->setInt(1, req_id);
+
+        sql::ResultSet* res = prep_stmt->executeQuery();
+        while (res->next())
+        {
+            vResult.push_back(res->getString("i_send_id"));
+            vResult.push_back(res->getString("i_channel_id"));
+            vResult.push_back(GetString(res->getBlob("vch_content")));
+            vResult.push_back(res->getString("d_send_time"));
+        }
+
+
+        delete prep_stmt;
+        delete res;
+        return true;
+
+    }
+    catch (sql::SQLException& e)
+    {
+        cout << "# ERR: SQLException in " << __FILE__;
+        cout << "(" << __FUNCTION__ << ") on line " << __LINE__ << endl;
+        cout << "# ERR: " << e.what();
+        cout << " (MySQL error code: " << e.getErrorCode();
+        cout << ", SQLState: " << e.getSQLState() << " )" << endl;
+        return false;
+    }
+
 }
 
 
@@ -249,7 +358,7 @@ bool SQLhandler::read_offline_message(db_connect_ptr conn_, int64_t req_id, vect
         while (res->next())
         {
             vResult.push_back(res->getString("send_id"));
-            vResult.push_back(res->getString("content"));
+            vResult.push_back(GetString(res->getBlob("content")));
             vResult.push_back(res->getString("send_time"));
         }
 
@@ -270,6 +379,69 @@ bool SQLhandler::read_offline_message(db_connect_ptr conn_, int64_t req_id, vect
     }
 }
 
+bool SQLhandler::save_channel_history(db_connect_ptr conn_, vector<string>& vPassData)
+{
+
+    try
+    {
+        if (!conn_->isValid())
+        {
+            cout << "conn is invalid!" << endl;
+            return false;
+        }
+
+        // 数据库
+        conn_->setSchema("account");
+
+        // 删除离线消息
+        sql::PreparedStatement* prep_update_stmt = conn_->prepareStatement(
+          "delete from t_channel_message where i_send_id = ? and i_recv_id = ? and i_channel_id = ? and i_flag = 0");
+
+        // 插入历史信息
+        string str_sql = string("insert into t_channel_message(i_send_id, i_recv_id, i_channel_id, vch_content, d_send_time, i_flag)")+
+            string("values(?, ?, ?, ?, ?, 1)");
+        sql::PreparedStatement* prep_insert_stmt = conn_->prepareStatement(str_sql);
+
+
+
+
+        // 更新离线消息
+        for(int i = 0; i < vPassData.size(); i +=5)
+        {
+            prep_update_stmt->setInt(1, stoi(vPassData[i]));
+            prep_update_stmt->setInt(2, stoi(vPassData[i+1]));
+            prep_update_stmt->setInt(3, stoi(vPassData[i+2]));
+
+            prep_update_stmt->executeUpdate();
+        }
+
+
+
+        for (int i = 0; i < vPassData.size(); i+=5)
+        {
+            istringstream iss(vPassData[i+3]);
+
+            prep_insert_stmt->setInt(1, stoi(vPassData[i]));
+            prep_insert_stmt->setInt(2, stoi(vPassData[i+1]));
+            prep_insert_stmt->setInt(3, stoi(vPassData[i+2]));
+            prep_insert_stmt->setBlob(4, &iss);
+            prep_insert_stmt->setString(5, vPassData[i+4]);
+
+            prep_insert_stmt->executeUpdate();
+        }
+
+
+
+
+    }
+    catch (exception& e)
+    {
+        cout << "# ERR: exception in " << __FILE__;
+        cout << "(" << __FUNCTION__ << ") on line " << __LINE__ << endl;
+        cout << "# ERR: " << e.what() << endl;
+    }
+
+}
 
 
 
@@ -287,35 +459,41 @@ bool SQLhandler::save_to_history(db_connect_ptr conn_, int64_t recv_id_, vector<
         // 数据库
         conn_->setSchema("account");
 
-        // 获得联系人列表
-        sql::PreparedStatement* prep_delete_stmt = conn_->prepareStatement(
+        // 删除离线消息
+        sql::PreparedStatement* prep_update_stmt = conn_->prepareStatement(
           "delete from t_message where recv_id = ? and send_id = ? and flag = 0");
 
+        // 插入历史信息
         sql::PreparedStatement* prep_insert_stmt = conn_->prepareStatement(
-          "insert into t_message(recv_id, send_id, content, send_time, flag) values(?,?,?,?,1)");
+          "insert into t_message(recv_id, send_id, content, send_time, flag) values(?, ?, ?, ?, 1)");
 
 
-        // 先删除离线消息
+
+        // 更新离线消息
         for(int i = 0; i < vPassData.size(); i +=3)
         {
-            prep_delete_stmt->setInt(1, recv_id_);
-            prep_delete_stmt->setInt(2, stoi(vPassData[i]));
+            prep_update_stmt->setInt(1, recv_id_);
+            prep_update_stmt->setInt(2, stoi(vPassData[i]));
 
-            prep_delete_stmt->execute();
+            prep_update_stmt->executeUpdate();
         }
 
 
 
-        // 新增历史消息
-        for(int i = 0; i < vPassData.size(); i +=3)
+        for (int i = 0; i < vPassData.size(); i+=3)
         {
+            istringstream iss(vPassData[i+1]);
+
+
             prep_insert_stmt->setInt(1, recv_id_);
             prep_insert_stmt->setInt(2, stoi(vPassData[i]));
-            prep_insert_stmt->setString(3, vPassData[i+1]);
+            prep_insert_stmt->setBlob(3, &iss);
             prep_insert_stmt->setString(4, vPassData[i+2]);
 
-            prep_insert_stmt->execute();
+            prep_insert_stmt->executeUpdate();
         }
+
+
 
 
     }
@@ -485,6 +663,14 @@ bool SQLhandler::exit_channel(db_connect_ptr conn_, vector<string>& vPassData, v
 }
 
 
+
+string SQLhandler::GetString(istream* is)
+{
+    istreambuf_iterator<char> end_pos;
+    string content(istreambuf_iterator<char>(*is), end_pos);
+
+    return content;
+}
 
 
 
