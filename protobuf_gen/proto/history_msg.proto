@@ -1,0 +1,15 @@
+syntax="proto3";
+package IM;
+
+import "chat.proto";
+
+
+message HistoryMsg
+{
+    int64 req_id		= 1;	// 请求者id
+    int64 target_id		= 2;	// 目标用户id
+    repeated ChatPkt chat_message = 3; // 消息集合
+}
+
+
+

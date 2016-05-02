@@ -1,0 +1,13 @@
+syntax="proto3";
+package IM;
+
+
+
+message FetchHistoryReq
+{
+    int64 req_id		= 1;	// 请求者id
+    int64 target_id		= 2;	// 目标用户id
+}
+
+
+
