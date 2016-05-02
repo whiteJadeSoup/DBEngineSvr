@@ -90,13 +90,14 @@ void RouterConn::handle_add_channel_offline_msg(pb_message_ptr p_msg_)
             int32_t ch_id   = it->channel_id();
             string content  = it->content();
             string send_tm  = it->send_time();
-
+            string send_nm  = it->send_name();
 
             vPassData.push_back(to_string(send_id));
             vPassData.push_back(to_string(recv_id));
             vPassData.push_back(to_string(ch_id));
             vPassData.push_back(move(content));
             vPassData.push_back(move(send_tm));
+            vPassData.push_back(move(send_nm));
         }
 
 
@@ -124,26 +125,27 @@ void RouterConn::handle_offline_message(pb_message_ptr p_msg_)
         const FieldDescriptor* f_recv_id = descriptor->FindFieldByName("recv_id");
         const FieldDescriptor* f_content = descriptor->FindFieldByName("content");
         const FieldDescriptor* f_send_tm = descriptor->FindFieldByName("send_time");
-
+        const FieldDescriptor* f_send_nm = descriptor->FindFieldByName("send_name");
 
         assert(f_send_id && f_send_id->type()==FieldDescriptor::TYPE_INT64);
         assert(f_recv_id && f_recv_id->type()==FieldDescriptor::TYPE_INT64);
         assert(f_content && f_content->type()==FieldDescriptor::TYPE_BYTES);
         assert(f_send_tm && f_send_tm->type()==FieldDescriptor::TYPE_STRING);
-
+        assert(f_send_nm && f_send_nm->type()==FieldDescriptor::TYPE_STRING);
 
 
         int64_t send_id = rf->GetInt64(*p_msg_,  f_send_id);
         int64_t recv_id = rf->GetInt64(*p_msg_,  f_recv_id);
         string  content = rf->GetString(*p_msg_, f_content);
         string  send_tm = rf->GetString(*p_msg_, f_send_tm);
-
+        string  send_nm = rf->GetString(*p_msg_, f_send_nm);
 
         vector<string> vPassData;
         vPassData.push_back(to_string(send_id));
         vPassData.push_back(to_string(recv_id));
         vPassData.push_back(content);
         vPassData.push_back(send_tm);
+        vPassData.push_back(send_nm);
 
 
         db_connect_ptr free_conn = ConnPool::get_instance()->get_free_conn();

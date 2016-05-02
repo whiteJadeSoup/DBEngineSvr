@@ -107,6 +107,15 @@ enum class M2D
       * 请求离开频道
       */
      EXIT_CHANNEL                           = 5013,
+
+     /*
+      * 请求历史消息
+      */
+     FETCH_HISTORY                          = 5014,
+     /*
+      * 请求频道历史消息
+      */
+     FETCH_CHANNEL_HISTORY                  = 5015,
 };
 
 

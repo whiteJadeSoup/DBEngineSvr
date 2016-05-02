@@ -11,7 +11,7 @@
 #include "message_cach.pb.h"
 #include "channel.pb.h"
 #include "user_update.pb.h"
-
+#include "history_msg.pb.h"
 
 #include <iostream>
 #include <google/protobuf/repeated_field.h>
@@ -38,8 +38,14 @@ void MsgConn::on_connect()
     m_dispatcher.register_message_callback((int)M2D::FETCH_OFFLINE_MESSAGE,
         bind(&MsgConn::handle_fetch_offline_message,    this, std::placeholders::_1));
 
+    m_dispatcher.register_message_callback((int)M2D::FETCH_CHANNEL_HISTORY,
+        bind(&MsgConn::handle_channel_history,          this, std::placeholders::_1));
+
+    m_dispatcher.register_message_callback((int)M2D::FETCH_HISTORY,
+        bind(&MsgConn::handle_history,                  this, std::placeholders::_1)) ;
+
     m_dispatcher.register_message_callback((int)M2D::FETCH_CHANNEL_OFFLINE_MESSAGE,
-        bind(&MsgConn::handle_fetch_channel_offline_msg,    this, std::placeholders::_1));
+        bind(&MsgConn::handle_fetch_channel_offline_msg,this, std::placeholders::_1));
 
     m_dispatcher.register_message_callback((int)M2D::SAVE_TO_HISTORY,
         bind(&MsgConn::handle_save_history,             this, std::placeholders::_1));
@@ -226,14 +232,14 @@ void MsgConn::handle_fetch_channel_offline_msg(pb_message_ptr p_msg_)
         IM::ChannelMsgCach MessageCach;
         MessageCach.set_req_id(id);
 
-        if (result.size() < 4)
+        if (result.size() < 5)
         {
-            cout << "error! size < 4! req_id: " << id << endl;
+            cout << "error! size < 5! req_id: " << id << endl;
             return ;
         }
 
 
-        for(int i = 0; i < result.size(); i += 4)
+        for(int i = 0; i < result.size(); i += 5)
         {
             IM::ChannelChatPkt* pMessage = MessageCach.add_channel_messages();
             pMessage->set_recv_id(id);
@@ -241,6 +247,7 @@ void MsgConn::handle_fetch_channel_offline_msg(pb_message_ptr p_msg_)
             pMessage->set_channel_id(stoi(result[i+1]));
             pMessage->set_content(result[i+2]);
             pMessage->set_send_time(result[i+3]);
+            pMessage->set_send_name(result[i+4]);
         }
 
 
@@ -251,6 +258,114 @@ void MsgConn::handle_fetch_channel_offline_msg(pb_message_ptr p_msg_)
     CATCH
 
 }
+
+
+void MsgConn::handle_history(pb_message_ptr p_msg_)
+{
+
+    TRY
+
+        auto descriptor = p_msg_->GetDescriptor();
+        const Reflection* rf = p_msg_->GetReflection();
+        const FieldDescriptor* f_req_id = descriptor->FindFieldByName("req_id");
+        const FieldDescriptor* f_target_id = descriptor->FindFieldByName("target_id");
+
+
+        assert(f_req_id && f_req_id->type() == FieldDescriptor::TYPE_INT64);
+        assert(f_target_id && f_target_id->type() == FieldDescriptor::TYPE_INT64);
+
+
+        int64_t req_id = rf->GetInt64(*p_msg_, f_req_id);
+        int64_t target_id = rf->GetInt64(*p_msg_, f_target_id);
+
+
+
+        db_connect_ptr conn = ConnPool::get_instance()->get_free_conn();
+        vector<string> result;
+        m_sql_handler.read_history(conn, req_id, target_id, result);
+
+
+        IM::HistoryMsg message_cach;
+        message_cach.set_req_id(req_id);
+        message_cach.set_target_id(target_id);
+
+        for(int i = 0; i < result.size(); i+=3)
+        {
+            IM::ChatPkt* pChat = message_cach.add_chat_message();
+            pChat->set_send_id(req_id);
+            pChat->set_recv_id(target_id);
+            pChat->set_content(result[i]);
+            pChat->set_send_time(result[i+1]);
+            pChat->set_send_name(result[i+2]);
+
+        }
+
+        // release conn
+        ConnPool::get_instance()->release_conn(conn);
+
+        CMsg packet;
+        packet.encode((int)M2D::FETCH_HISTORY, message_cach);
+        send(packet);
+
+
+    CATCH
+
+}
+
+
+void MsgConn::handle_channel_history(pb_message_ptr p_msg_)
+{
+
+    TRY
+        auto descriptor = p_msg_->GetDescriptor();
+        const Reflection* rf = p_msg_->GetReflection();
+        const FieldDescriptor* f_req_id = descriptor->FindFieldByName("user_id");
+        const FieldDescriptor* f_channel_id = descriptor->FindFieldByName("channel_id");
+
+
+        assert(f_req_id && f_req_id->type() == FieldDescriptor::TYPE_INT64);
+        assert(f_channel_id && f_channel_id->type() == FieldDescriptor::TYPE_INT32);
+
+
+        int64_t req_id = rf->GetInt64(*p_msg_, f_req_id);
+        int32_t channel_id = rf->GetInt32(*p_msg_, f_channel_id);
+
+
+        db_connect_ptr conn = ConnPool::get_instance()->get_free_conn();
+        vector<string> result;
+        m_sql_handler.read_channel_history(conn, channel_id, result);
+
+
+        IM::ChannelMsgCach message_cach;
+        message_cach.set_req_id(req_id);
+
+
+        for(int i = 0; i < result.size(); i+=6)
+        {
+            IM::ChannelChatPkt* pChat = message_cach.add_channel_messages();
+            pChat->set_send_id((int64_t)(stoi(result[i])));
+            pChat->set_recv_id((int64_t)(stoi(result[i+1])));
+            pChat->set_channel_id(stoi(result[i+2]));
+            pChat->set_content(result[i+3]);
+            pChat->set_send_time(result[i+4]);
+            pChat->set_send_name(result[i+5]);
+
+        }
+
+        // release conn
+        ConnPool::get_instance()->release_conn(conn);
+
+        CMsg packet;
+        packet.encode((int)M2D::FETCH_CHANNEL_HISTORY, message_cach);
+        send(packet);
+
+
+
+    CATCH
+
+
+}
+
 
 
 void MsgConn::handle_fetch_offline_message(pb_message_ptr p_msg_)
@@ -281,18 +396,19 @@ void MsgConn::handle_fetch_offline_message(pb_message_ptr p_msg_)
         IM::MessageCach MessageCach;
         MessageCach.set_user_id(id);
 
-        if (result.size() < 3)
+        if (result.size() < 4)
         {
-            cout << "error! size < 3! req_id: " << id << endl;
+            cout << "error! size < 4! req_id: " << id << endl;
             return ;
         }
 
-        for(int i = 0; i < result.size(); i += 3)
+        for(int i = 0; i < result.size(); i += 4)
         {
             IM::ChatPkt *pMessage = MessageCach.add_chat_message();
             pMessage->set_send_id((int64_t)(stoi(result[i])));
             pMessage->set_content(result[i+1]);
             pMessage->set_send_time(result[i+2]);
+            pMessage->set_send_name(result[i+3]);
         }
 
         // release conn
@@ -326,6 +442,8 @@ void MsgConn::handle_save_channel_history(pb_message_ptr p_msg_)
         RepeatedPtrField<IM::ChannelChatPkt> chat_messages
             = rf->GetRepeatedPtrField<IM::ChannelChatPkt>(*p_msg_, f_messages);
 
+
+
         auto it = chat_messages.begin();
         for(; it != chat_messages.end(); ++it)
         {
@@ -334,12 +452,15 @@ void MsgConn::handle_save_channel_history(pb_message_ptr p_msg_)
             int32_t ch_id   = it->channel_id();
             string content  = it->content();
             string send_tm  = it->send_time();
+            string send_nm  = it->send_name();
+
 
             vPassData.push_back(to_string(send_id));
             vPassData.push_back(to_string(recv_id));
             vPassData.push_back(to_string(ch_id));
             vPassData.push_back(move(content));
             vPassData.push_back(move(send_tm));
+            vPassData.push_back(move(send_nm));
         }
 
         db_connect_ptr conn = ConnPool::get_instance()->get_free_conn();
@@ -387,11 +508,12 @@ void MsgConn::handle_save_history(pb_message_ptr p_msg_)
             int64_t send_id = it->send_id();
             string content  = it->content();
             string send_tm  = it->send_time();
-
+            string send_nm  = it->send_name();
 
             vPassData.push_back(to_string(send_id));
             vPassData.push_back(move(content));
             vPassData.push_back(move(send_tm));
+            vPassData.push_back(move(send_nm));
         }
 
 

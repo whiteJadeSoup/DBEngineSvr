@@ -45,6 +45,10 @@ private:
     void handle_exit_channel(pb_message_ptr);
     // 读取用户信息
     void handle_channel_user_update(pb_message_ptr);
+    // 读取历史消息
+    void handle_history(pb_message_ptr);
+    // 读取频道历史消息
+    void handle_channel_history(pb_message_ptr);
 
 
 private:

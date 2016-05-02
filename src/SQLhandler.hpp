@@ -40,8 +40,10 @@ public:
     bool join_channel(db_connect_ptr, vector<string>&, vector<string>&);
     // 离开频道
     bool exit_channel(db_connect_ptr, vector<string>&, vector<string>&);
-
-
+    // 读取历史消息
+    bool read_history(db_connect_ptr, int64_t, int64_t, vector<string>&);
+    // 读取频道历史消息
+    bool read_channel_history(db_connect_ptr, int32_t, vector<string>&);
 
 
 private:
